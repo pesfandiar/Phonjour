@@ -1,0 +1,13 @@
+[
+    {
+        "model": "Billing",
+            "data": {
+                "id": 1,
+                "external_id": "ch_FAKEID",
+                "amount": 12.34,
+                "paid": true,
+                "createdAt": "2015-06-03 19:21:39",
+                "Account": 1
+             }
+    }
+]

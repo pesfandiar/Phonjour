@@ -1,0 +1,173 @@
+extends layout
+
+block navbar
+    include navbar
+
+block sidebar
+    include sidebar
+
+block content
+    #billing_div
+        != css("datepicker")
+        != js("datepicker")
+        h3 Billing
+        .panel.panel-default
+            .panel-body
+                .row
+                    .col-xs-12.col-sm-2
+                        label(for="now_input") Date in Period:
+                        span.glyphicon.glyphicon-question-sign.left5(data-toggle="tooltip", title="Pick a date to see the billing information for the period it belongs to.")
+                    .col-xs-12.col-sm-4
+                        input#now_input.form-control.datepicker.bottom10(type="text", data-provide="datepicker", data-date-autoclose="true", data-date-today-highlight="true", data-date-format="yyyy-mm-dd", data-date-orientation="auto")
+                    .col-xs-12.col-sm-2
+                        button.btn.btn-primary(type="button", data-bind="click: populateUsage") Refresh
+                .row.top15
+                    .col-xs-12.col-sm-12
+                        strong(data-bind="text: 'Usage History in Period \"' + periodRange() + '\":'")
+                .row.top15
+                    .col-xs-12.col-sm-12
+                        span(data-bind="text: usageTitle")
+                .row.top30
+                    .col-xs-12.col-sm-12
+                        .table-responsive
+                            table.table.table-striped
+                                thead
+                                    tr.top-border-thick.bottom-border-thick
+                                        td
+                                            strong Timestamp
+                                        td
+                                            strong From
+                                        td
+                                            strong To
+                                        td
+                                            strong Type
+                                        td
+                                            strong Minutes
+                                        td
+                                            strong Minutes Included
+                                        td
+                                            strong cost
+                                tbody(data-bind="foreach: usageList")
+                                    tr
+                                        td(data-bind = "text: timestamp")
+                                        td(data-bind = "text: fromNumber")
+                                        td(data-bind = "text: toNumber")
+                                        td(data-bind = "text: type")
+                                        td(data-bind = "text: minutes")
+                                        td(data-bind = "text: minutesIncluded")
+                                        td(data-bind = "text: cost")
+                                tr(data-bind="visible: usageList().length === 0").top-border-thick.bottom-border-thick
+                                    td(colspan="7")
+                                        center No calls made in this period
+                                tr(data-bind="visible: usageList().length > 0").top-border-thick
+                                    td(colspan="5").right-align
+                                        strong Minutes Used:
+                                    td(colspan="2")
+                                        span(data-bind="text: minutesUsed")
+                                tr(data-bind="visible: usageList().length > 0")
+                                    td(colspan="5").right-align
+                                        strong Minutes Included:
+                                    td(colspan="2")
+                                        span(data-bind="text: minutesIncluded")
+                                tr(data-bind="visible: usageList().length > 0")
+                                    td(colspan="5").right-align
+                                        strong Usage Fee:
+                                    td(colspan="2")
+                                        span(data-bind="text: usageFee")
+                                tr(data-bind="visible: usageList().length > 0, css: {'bottom-border-thick': !totalFeeDiscounted()}")
+                                    td(colspan="5").right-align
+                                        strong Total Fee:
+                                    td(colspan="2")
+                                        span(data-bind="text: totalFee")
+                                tr(data-bind="visible: usageList().length > 0 && totalFeeDiscounted()").bottom-border-thick
+                                    td(colspan="5").right-align
+                                        strong Total Fee after Promotion:
+                                    td(colspan="2")
+                                        span(data-bind="text: totalFeeDiscounted")
+                        #usage_spinner.spinner-hidden
+                .row.top30.error-message-row#usage_error_row
+                    .col-xs-12.col-sm-6.col-sm-offset-3
+                        .alert.alert-danger
+                            span.glyphicon.glyphicon-exclamation-sign
+                            span.left5#usage_error_message .
+                .row.top15
+                    .col-xs-12.col-sm-3
+                        button.btn.btn-default(type="button", data-bind="click: back") Back
+        script(type="text/javascript").
+            $(document).ready(function() {
+                function BillingViewModel() {
+                    this.usageTitle = ko.observable("Loading...");
+                    this.usageList = ko.observableArray();
+                    this.periodRange = ko.observable("");
+                    this.minutesUsed = ko.observable();
+                    this.minutesIncluded = ko.observable();
+                    this.usageFee = ko.observable();
+                    this.totalFee = ko.observable();
+                    this.totalFeeDiscounted = ko.observable();
+
+                    $("#now_input").val(new Date().toISOString().slice(0, 10));
+
+                    this.back = function() {
+                        window.history.back();
+                    };
+
+                    this.populateUsage = function() {
+                        if (#{userStatus == 'PURCHASED' ? 'true' : 'false'}) {
+                            $("#usage_spinner").removeClass("spinner-hidden");
+                            $("#usage_spinner").addClass("spinner");
+                            $("#usage_error_row").hide();
+                            Phonjour.api('usage', 'getPeriodData', {periodDate: $("#now_input").val()})
+                                .done(function(data) {
+                                        if (data && data.periodData) {
+                                            this.usageTitle("Phone Number: " + data.periodData.phoneNumber);
+                                            this.periodRange(data.periodData.periodStartDate + " - " + data.periodData.periodEndDate);
+                                            this.minutesUsed(data.periodData.minutesUsed);
+                                            this.minutesIncluded(data.periodData.minutesIncluded);
+                                            this.usageFee(data.periodData.usageFee);
+                                            this.totalFee(data.periodData.totalFee);
+                                            this.totalFeeDiscounted(data.periodData.totalFeeDiscounted);
+
+                                            this.usageList.removeAll();
+                                            for (var i = data.periodData.usageList.length - 1; i >= 0 ; i--) {
+                                                this.usageList.push(data.periodData.usageList[i]);
+                                            }
+                                        } else {
+                                            $("#usage_error_message").text("Was not able to retrieve usage data!");
+                                            $("#usage_error_row").show();
+                                        }
+                                    }.bind(this))
+                                .fail(function(error) {
+                                        $("#usage_error_message").text("Was not able to calculate usage data!");
+                                        $("#usage_error_row").show();
+                                    })
+                                .always(function() {
+                                        $("#usage_spinner").removeClass("spinner");
+                                        $("#usage_spinner").addClass("spinner-hidden");
+                                    });
+                        } else {
+                            this.usageTitle("Pick a phone number to see its usage here.");
+                            this.periodRange("N/A");
+                            this.minutesUsed(0);
+                            this.minutesIncluded(0);
+                            this.usageFee(0);
+                            this.totalFee(0);
+                            this.totalFeeDiscounted(0);
+
+                            this.usageList.removeAll();
+                            }
+                    }.bind(this);
+                }
+
+                var billingViewModel = new BillingViewModel();
+                ko.applyBindings(billingViewModel, document.getElementById('billing_div'));
+                billingViewModel.populateUsage();
+
+                // Turn off keyboard on mobile
+                $("#now_input").datepicker()
+                    .on("hide", function() {
+                        $("#now_input").attr("disabled", false);
+                    })
+                    .on("show", function() {
+                        $("#now_input").attr("disabled", true);
+                    });
+            });

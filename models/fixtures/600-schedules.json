@@ -1,0 +1,86 @@
+[
+    {
+        "model": "Schedule",
+            "data": {
+                "id": 1,
+                "start_time": 36,
+                "end_time": 68,
+                "day_of_week": 0,
+                "open": true,
+                "Extension": 1
+             }
+    },
+    {
+        "model": "Schedule",
+            "data": {
+                "id": 2,
+                "start_time": 36,
+                "end_time": 68,
+                "day_of_week": 1,
+                "open": true,
+                "Extension": 1
+             }
+    },
+    {
+        "model": "Schedule",
+            "data": {
+                "id": 3,
+                "start_time": 36,
+                "end_time": 68,
+                "day_of_week": 2,
+                "open": true,
+                "Extension": 1
+             }
+    },
+    {
+        "model": "Schedule",
+            "data": {
+                "id": 4,
+                "start_time": 36,
+                "end_time": 68,
+                "day_of_week": 3,
+                "open": true,
+                "Extension": 1
+             }
+    },
+    {
+        "model": "Schedule",
+            "data": {
+                "id": 5,
+                "start_time": 36,
+                "end_time": 68,
+                "day_of_week": 4,
+                "open": true,
+                "Extension": 1
+             }
+    },
+    {
+        "model": "Schedule",
+            "data": {
+                "id": 6,
+                "start_time": 40,
+                "end_time": 60,
+                "day_of_week": 5,
+                "open": true,
+                "Extension": 1
+             }
+    },
+    {
+        "model": "Schedule",
+            "data": {
+                "id": 7,
+                "day_of_week": 6,
+                "open": false,
+                "Extension": 1
+             }
+    },
+    {
+        "model": "Schedule",
+            "data": {
+                "id": 8,
+                "day_of_week": 7,
+                "open": false,
+                "Extension": 1
+             }
+    }
+]

@@ -1,0 +1,312 @@
+extends layout
+
+block navbar
+    include navbar
+
+block sidebar
+    include sidebar
+
+block content
+    #account_settings_div
+        h3 Account Settings
+        .panel.panel-default
+            .panel-body#account_settings_panel
+                .row
+                    .col-xs-12.col-sm-6
+                        h4 Account Information
+                .row.top30
+                    .col-xs-12.col-sm-3
+                        label(for="name_input") Full Name:
+                    .col-xs-12.col-sm-3
+                        input.form-control(type = "text", data-bind="value: name, valueUpdate: 'afterkeydown'")#name_input
+                .row.top15
+                    .col-xs-12.col-sm-3
+                        label(for="email_input") Email:
+                    .col-xs-12.col-sm-3
+                        input.form-control(type = "email", data-bind="value: email, valueUpdate: 'afterkeydown'")#email_input
+                    .col-xs-12.col-sm-6.top10(data-bind="visible: originalEmail() !== email()")
+                        span.glyphicon.glyphicon-warning-sign
+                        span.left5 Note: Changing your email will change your username and sign you out!
+                .row.top15
+                    .col-xs-12.col-sm-3
+                        label(for="phone_input") Phone Number:
+                    .col-xs-12.col-sm-3
+                        input.form-control(type = "text", pattern="[0-9]{10}", data-bind="value: phone, valueUpdate: 'afterkeydown'")#phone_input
+                .row.top15
+                    .col-xs-12.col-sm-3
+                        label(for="company_input") Company:
+                    .col-xs-12.col-sm-3
+                        input.form-control(type = "text", data-bind="value: company, valueUpdate: 'afterkeydown'")#company_input
+                .row.top15
+                    .col-xs-12.col-sm-3
+                        label(for="timezone_input") Timezone:
+                        span.glyphicon.glyphicon-question-sign.left5(data-toggle="tooltip", title="Please pick a city with the same timezone as yours. The business and extension availability hours are based on local times of this timezone.")
+                    .col-xs-12.col-sm-3
+                        select.form-control(data-bind="options: timezoneOptions, value: timezone")#timezone_input
+                .row.top30
+                    .col-xs-12.col-sm-3.col-sm-offset-3
+                        button.btn.btn-primary#account_settings_button(type="button", data-bind="click: saveSettings, enable: formValidSettings() && settingsDirty()") Save Settings
+                        #account_settings_spinner.spinner-hidden
+                .row.top30.error-message-row#account_settings_error_row
+                    .col-xs-12.col-sm-3.col-sm-offset-3
+                        .alert.alert-danger
+                            span.glyphicon.glyphicon-exclamation-sign
+                            span.left5#account_settings_error_message .
+                .row.top15
+                    .col-xs-12.col-sm-3.col-sm-offset-3
+                        button.btn.btn-default(type="button", data-bind="click: back") Back
+        .panel.panel-default
+            .panel-body#change_password_panel
+                .row
+                    .col-xs-12.col-sm-6
+                        h4 Change Password
+                .row.top30
+                    .col-xs-12.col-sm-3
+                        label(for="old_password_input") Old Password:
+                    .col-xs-12.col-sm-3
+                        input.form-control(type = "password", data-bind="value: oldPassword, valueUpdate: 'afterkeydown'")#old_password_input
+                .row.top15
+                    .col-xs-12.col-sm-3
+                        label(for="password_input") New Password:
+                        span.glyphicon.glyphicon-remove.form-invalid-icon(data-bind="visible: !passwordsValid()")
+                        span.glyphicon.glyphicon-ok.form-valid-icon(data-bind="visible: passwordsValid")
+                    .col-xs-12.col-sm-3
+                        input.form-control(type = "password", data-bind="value: password, valueUpdate: 'afterkeydown'")#password_input
+                .row.top15
+                    .col-xs-12.col-sm-3
+                        label(for="password2_input") Confirm New Password:
+                        span.glyphicon.glyphicon-remove.form-invalid-icon(data-bind="visible: !passwordsMatch()")
+                        span.glyphicon.glyphicon-ok.form-valid-icon(data-bind="visible: passwordsMatch")
+                    .col-xs-12.col-sm-3
+                        input.form-control(type = "password", data-bind="value: password2, valueUpdate: 'afterkeydown'")#password2_input
+                .row.top30
+                    .col-xs-12.col-sm-3.col-sm-offset-3
+                        button.btn.btn-primary#change_password_button(type="button", data-bind="click: changePassword, enable: passwordsValid() && passwordsMatch()") Change Password
+                        #change_password_spinner.spinner-hidden
+                .row.top30.error-message-row#change_password_error_row
+                    .col-xs-12.col-sm-3.col-sm-offset-3
+                        .alert.alert-danger
+                            span.glyphicon.glyphicon-exclamation-sign
+                            span.left5#change_password_error_message .
+                .row.top30.error-message-row#change_password_success_row
+                    .col-xs-12.col-sm-3.col-sm-offset-3
+                        .alert.alert-success
+                            span.glyphicon.glyphicon-ok
+                            span.left5 Password successfully changed!
+                .row.top15
+                    .col-xs-12.col-sm-3.col-sm-offset-3
+                        button.btn.btn-default(type="button", data-bind="click: back") Back
+        script(type="text/javascript").
+            $(document).ready(function() {
+                var PASSWORD_MIN_LEN = 8;
+                function AccountSettingsViewModel() {
+                    var self = this;
+                    this.name = ko.observable("");
+                    this.originalEmail = ko.observable("");
+                    this.email = ko.observable("");
+                    this.phone = ko.observable("");
+                    this.company = ko.observable("");
+                    this.settingsDirty = ko.observable(false);
+
+                    this.oldPassword = ko.observable("");
+                    this.password = ko.observable("");
+                    this.password2 = ko.observable("");
+
+                    this.timezone = ko.observable("America/Los_Angeles");
+                    this.timezoneOptions = [
+                        // 3:30
+                        "America/St_Johns",
+                        // 4:00
+                        "America/Halifax",
+                        // 5:00
+                        "America/Toronto",
+                        "America/New_York",
+                        // 6:00
+                        "America/Winnipeg",
+                        "America/Chicago",
+                        // 6:00 irregular
+                        "America/Regina",
+                        // 7:00
+                        "America/Edmonton",
+                        "America/Denver",
+                        // 7:00 irregular
+                        "America/Phoenix",
+                        // 8:00
+                        "America/Vancouver",
+                        "America/Los_Angeles",
+                        // 9:00
+                        "America/Anchorage",
+                        // 10:00
+                        "Pacific/Honolulu"
+                    ];
+
+
+                    this.formValidSettings = ko.computed(function() {
+                            return this.name() &&
+                                    this.email() &&
+                                    this.phone();
+                        }.bind(this));
+
+                    this.passwordsValid = ko.computed(function() {
+                            var password = this.password();
+                            var oldPassword = this.oldPassword();
+                            return password && password.length >= PASSWORD_MIN_LEN &&
+                                    oldPassword && oldPassword.length >= PASSWORD_MIN_LEN;
+                        }.bind(this));
+
+                    this.passwordsMatch = ko.computed(function() {
+                            var password = this.password();
+                            var password2 = this.password2();
+                            return password &&
+                                    password2 &&
+                                    password2.length > PASSWORD_MIN_LEN &&
+                                    password === password;
+                        }.bind(this));
+
+                    var makeSettingsDirty = function() {
+                        this.settingsDirty(true);
+                    }.bind(this);
+                    this.name.subscribe(makeSettingsDirty);
+                    this.email.subscribe(makeSettingsDirty);
+                    this.phone.subscribe(makeSettingsDirty);
+                    this.company.subscribe(makeSettingsDirty);
+                    this.timezone.subscribe(makeSettingsDirty);
+
+                    this.back = function() {
+                        window.history.back();
+                    };
+
+                    this.populateSettings = function(settings) {
+                        var _populateSettings = function(settings) {
+                            this.name(settings.name);
+                            this.email(settings.email);
+                            this.originalEmail(settings.email);
+                            this.phone(settings.phone);
+                            this.company(settings.company);
+                            this.timezone(settings.timezone);
+                            this.settingsDirty(false);
+                        }.bind(this);
+
+                        if (settings) {
+                            _populateSettings(settings);
+                            return;
+                        }
+
+                        $("#account_settings_spinner").removeClass("spinner-hidden");
+                        $("#account_settings_spinner").addClass("spinner");
+                        Phonjour.api('user', 'getSettings')
+                            .done(function(data) {
+                                    if (data && data.settings) {
+                                        _populateSettings(data.settings);
+                                    } else {
+                                        $("#account_settings_error_message").text("Was not able to retrieve the settings!");
+                                        $("#account_settings_error_row").show();
+                                    }
+                                })
+                            .fail(function(error) {
+                                    $("#account_settings_error_message").text(error.responseText);
+                                    $("#account_settings_error_row").show();
+                                })
+                            .always(function() {
+                                    $("#account_settings_spinner").removeClass("spinner");
+                                    $("#account_settings_spinner").addClass("spinner-hidden");
+                                });
+                    }.bind(this);
+
+                    this.saveSettings = (function() {
+                        var name = this.name();
+                        var email = this.email();
+                        var phone = this.phone();
+                        var company = this.company();
+                        var timezone = this.timezone();
+
+                        if (!this.formValidSettings()) {
+                            return;
+                        }
+
+                        $("#account_settings_spinner").removeClass("spinner-hidden");
+                        $("#account_settings_spinner").addClass("spinner");
+                        var apiData = {
+                            name: name,
+                            email: email,
+                            phone: phone,
+                            company: company,
+                            timezone: timezone
+                        };
+                        Phonjour.api('user', 'saveSettings', apiData)
+                            .done(function(data) {
+                                    if (data && data.settings) {
+                                        if (data.settings.email !== this.originalEmail()) {
+                                            window.location.href = "/sign_out";
+                                        } else {
+                                            this.populateSettings(data.settings);
+                                        }
+                                    } else {
+                                        $("#account_settings_error_message").text("Was not able to save the settings!");
+                                        $("#account_settings_error_row").show();
+                                    }
+                                }.bind(this))
+                            .fail(function(error) {
+                                    $("#account_settings_error_message").text(error.responseText);
+                                    $("#account_settings_error_row").show();
+                                })
+                            .always(function() {
+                                    $("#account_settings_spinner").removeClass("spinner");
+                                    $("#account_settings_spinner").addClass("spinner-hidden");
+                                });
+                    }).bind(this);
+
+                    this.changePassword = (function() {
+                        var password = this.password();
+                        var oldPassword = this.oldPassword();
+
+                        if (!this.passwordsValid() || !this.passwordsMatch()) {
+                            return;
+                        }
+
+                        $("#change_password_spinner").removeClass("spinner-hidden");
+                        $("#change_password_spinner").addClass("spinner");
+                        $("#change_password_success_row").hide();
+                        $("#change_password_error_row").hide();
+                        var apiData = {
+                            password: password,
+                            oldPassword: oldPassword
+                        };
+                        Phonjour.api('user', 'changePassword', apiData)
+                            .done(function(data) {
+                                    if (data && data.success) {
+                                        this.password("");
+                                        this.password2("");
+                                        this.oldPassword("");
+                                        $("#change_password_success_row").show();
+                                    } else {
+                                        $("#change_password_error_message").text("Was not able to change the password!");
+                                        $("#change_password_error_row").show();
+                                    }
+                                }.bind(this))
+                            .fail(function(error) {
+                                    $("#change_password_error_message").text(error.responseText);
+                                    $("#change_password_error_row").show();
+                                })
+                            .always(function() {
+                                    $("#change_password_spinner").removeClass("spinner");
+                                    $("#change_password_spinner").addClass("spinner-hidden");
+                                });
+                    }).bind(this);
+                }
+
+                var accountSettingsViewModel = new AccountSettingsViewModel();
+                ko.applyBindings(accountSettingsViewModel, document.getElementById('account_settings_div'));
+
+                accountSettingsViewModel.populateSettings();
+
+                $("#account_settings_div").keyup(function(event){
+                    if(event.keyCode === 13){
+                        if ($("#change_password_panel input:focus").length) {
+                            $("#change_password_button").click();
+                        } else if ($("#account_settings_panel input:focus").length) {
+                            $("#account_settings_button").click();
+                        }
+                    }
+                });
+            });

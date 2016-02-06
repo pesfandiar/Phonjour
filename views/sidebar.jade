@@ -1,0 +1,34 @@
+div#sidebar
+    ul.nav.nav-sidebar
+        li
+            a(href='/dashboard') Dashboard
+        if userStatus == "SIGNED_UP"
+            li
+                a(href='/payment_setup') Pick a Phone Number
+        else if userStatus == "PAYMENT_ON_FILE"
+            li
+                a(href='/select_phone_number') Pick a Phone Number
+    ul.nav.nav-sidebar
+        li
+            a(href='/extensions') Extensions
+        li
+            a(href='/extension_settings') Greetings &amp; Hours
+    ul.nav.nav-sidebar
+        li
+            a(href='/account_settings') Account Settings
+        if userStatus == "SIGNED_UP"
+            li
+                a(href='/payment_setup') Add Payment Info
+        else
+            li
+                a(href='/payment_settings') Payment Settings
+        if userStatus == "PURCHASED"
+            li
+                a(href='/plan_settings') Plan Settings
+        li
+            a(href='/billing') Usage &amp; Billing
+
+    script(type="text/javascript").
+        $(document).ready(function() {
+                $("#sidebar a[href='" + window.location.pathname + "']").parent("li").addClass("active");
+            });

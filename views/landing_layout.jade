@@ -1,0 +1,87 @@
+doctype html
+html(lang="en")
+    head
+        meta(charset="utf-8")
+        meta(http-equiv="X-UA-Compatible", content="IE=edge")
+        meta(name="viewport", content="width=device-width, initial-scale=1")
+        meta(name="description", content="Phonjour, the receptionist in your pocket")
+        meta(name="author", content="Phonjour")
+        if override_page_title
+            block page_title
+        else
+            title Phonjour - The Receptionist in Your Pocket
+        // Bootstrap Core CSS
+        != css("bootstrap")
+        // Custom CSS
+        != css("landing-page")
+        // Custom Fonts
+        link(href="/public/font-awesome/css/font-awesome.min.css", rel="stylesheet", type="text/css")
+        // HTML5 shiv and Respond.js for IE8 support of HTML5 elements and media queries
+        != "<!--[if lt IE 9]>"
+        != js("html5shiv")
+        != js("respond")
+        != "<![endif]-->"
+        != js("jquery")
+        != js("bootstrap")
+        if googleAnalyticsId
+            script(type="text/javascript").
+                (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+                (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+                m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+                })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+                ga('create', '#{googleAnalyticsId}', 'auto');
+                ga('send', 'pageview');
+
+    body
+        // Navigation
+        nav.navbar.navbar-default.navbar-fixed-top.topnav(role="navigation")
+            .container.topnav
+                // Brand and toggle get grouped for better mobile display
+                .navbar-header
+                    button.navbar-toggle(type="button", data-toggle="collapse", data-target="#navbar-collapse")
+                        span.sr-only Toggle navigation
+                        span.icon-bar
+                        span.icon-bar
+                        span.icon-bar
+                    a.navbar-brand.topnav(href="/")
+                        span
+                            img(src="/public/images/logo-small.png", title="Phonjour - The receptionist in your pocket")
+                // Collect the nav links, forms, and other content for toggling
+                #navbar-collapse.collapse.navbar-collapse
+                    ul.nav.navbar-nav.navbar-right
+                        li
+                            a(href="/#home") Home
+                        li
+                            a(href="/#features") Features
+                        li
+                            a(href="/#pricing") Pricing
+                        li
+                            a(href="/#faq") FAQ
+                        li
+                            a(href="/#contact") Contact
+
+        block landing_content
+
+        // Footer
+        footer
+            .container
+                .row
+                    .col-lg-12
+                        ul.list-inline
+                            li
+                                a(href="/#home") Home
+                            li.footer-menu-divider ⋅
+                            li
+                                a(href="/#features") Features
+                            li.footer-menu-divider ⋅
+                            li
+                                a(href="/#pricing") Pricing
+                            li.footer-menu-divider ⋅
+                            li
+                                a(href="/#faq") FAQ
+                            li.footer-menu-divider ⋅
+                            li
+                                a(href="/#contact") Contact
+                        p.copyright.text-muted.small Copyright © Phonjour. All Rights Reserved
+

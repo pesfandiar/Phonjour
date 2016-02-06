@@ -1,0 +1,11 @@
+[
+    {
+        "model": "PaymentInfo",
+            "data": {
+                "id": 1,
+                "external_id": "cus_67XU7DQO9XSBDO",
+                "provider": "STRIPE",
+                "Account": 1
+             }
+    }
+]

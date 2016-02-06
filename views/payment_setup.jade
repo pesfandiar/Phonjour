@@ -1,0 +1,177 @@
+extends layout
+
+block navbar
+    include navbar
+
+block content
+    #payment_setup_div
+        h3 Payment Setup
+        script(type="text/javascript", src="https://js.stripe.com/v2/")
+        .panel.panel-default
+            .panel-body
+                .row
+                    .col-xs-12.col-sm-3
+                        label(for="name_input") Cardholder's Name:
+                    .col-xs-12.col-sm-3
+                        input.form-control(type = "text", data-bind="value: name")#name_input
+                .row.top15
+                    .col-xs-12.col-sm-3
+                        label(for="cc_input") Credit Card Number:
+                        span.glyphicon.glyphicon-remove.form-invalid-icon(data-bind="visible: !ccValid()")
+                        span.glyphicon.glyphicon-ok.form-valid-icon(data-bind="visible: ccValid")
+                        span.glyphicon.glyphicon-lock.left5(data-toggle="tooltip", title="Your credit card number is only transferred through secure connections, and is only stored on secure Stripe Inc. servers.")
+                    .col-xs-12.col-sm-3
+                        input.form-control(type = "text", data-bind="value: cc, valueUpdate: 'afterkeydown'")#cc_input
+                .row.top15
+                    .col-xs-12.col-sm-3
+                        label(for="ex_month_input") Expiration Month:
+                    .col-xs-12.col-sm-3
+                        select.form-control(data-bind="options: expiryMonths, value: expiryMonth")#ex_month_input
+                .row.top15
+                    .col-xs-12.col-sm-3
+                        label(for="ex_year_input") Expiration Year:
+                    .col-xs-12.col-sm-3
+                        select.form-control(data-bind="options: expiryYears, value: expiryYear")#ex_year_input
+                .row.top15
+                    .col-xs-12.col-sm-3
+                        label(for="security_input") Security Number:
+                        span.glyphicon.glyphicon-question-sign.left5(data-toggle="tooltip", title="The number on the back of your physical credit card.")
+                    .col-xs-12.col-sm-3
+                        input.form-control(type = "text", data-bind="value: security, , valueUpdate: 'afterkeydown'")#security_input
+                .row.top30
+                    .col-xs-12.col-sm-12
+                        ul
+                            li The credit card information is collected beforehand for identification purposes and will not be charged until you choose a plan and purchase a phone number. Please read <a href="/terms" target="blank">terms</a> for more info.
+                            li <b>Trial offers:</b> no subcription fee for 1 month, or 50% off for 3 months!
+                .row.top15
+                    .col-xs-12.col-sm-3.col-sm-offset-3
+                        button.btn.btn-primary#payment_setup_button(type="button", data-bind="click: enterCard, enable: formValid") Enter Card
+                        #cc_spinner.spinner-hidden
+                .row.top15
+                    .col-xs-12.col-sm-3.col-sm-offset-3
+                        a(href="/dashboard")
+                            button.btn.btn-default(type="button") Just Take Me to The Dashboard
+                .row.top30.error-message-row#cc_error_row
+                    .col-xs-12.col-sm-3.col-sm-offset-3
+                        .alert.alert-danger
+                            span.glyphicon.glyphicon-exclamation-sign
+                            span.left5#cc_error_message .
+
+        script(type="text/javascript").
+            $(document).ready(function() {
+                var stripePublic = "#{stripePublic}";
+                Stripe.setPublishableKey(stripePublic);
+
+                function CreditCardViewModel() {
+                    var self = this;
+                    this.name = ko.observable("");
+                    this.cc = ko.observable("");
+                    this.expiryMonth = ko.observable("");
+                    this.expiryYear = ko.observable("");
+                    this.security = ko.observable("");
+
+                    this.expiryMonths = ko.observableArray([
+                            "01 - January",
+                            "02 - February",
+                            "03 - March",
+                            "04 - April",
+                            "05 - May",
+                            "06 - June",
+                            "07 - July",
+                            "08 - August",
+                            "09 - September",
+                            "10 - October",
+                            "11 - November",
+                            "12 - December"
+                        ]);
+
+                    this.expiryYears = ko.observableArray([
+                            2015,
+                            2016,
+                            2017,
+                            2018,
+                            2019,
+                            2020,
+                            2021,
+                            2022,
+                            2023,
+                            2024,
+                            2025
+                        ]);
+
+                    this.formValid = ko.computed(function() {
+                            var cc = this.cc();
+                            return this.name() &&
+                                    cc &&
+                                    Stripe.card.validateCardNumber(cc) &&
+                                    this.expiryMonth() &&
+                                    this.expiryYear() &&
+                                    this.security();
+                        }.bind(this));
+
+                    this.ccValid = ko.computed(function() {
+                            return Stripe.card.validateCardNumber(this.cc());
+                        }.bind(this));
+
+
+                    this.enterCard = (function() {
+                        if (!this.formValid()) {
+                            return;
+                        }
+
+                        var name = this.name();
+                        var cc = this.cc();
+                        var expiryMonth = parseInt(this.expiryMonth(), 10);
+                        var expiryYear = this.expiryYear();
+                        var security = this.security();
+
+                        $("#cc_spinner").removeClass("spinner-hidden");
+                        $("#cc_spinner").addClass("spinner");
+
+                        function stripeResponseHandler(status, response) {
+                            if (response.error) {
+                                $("#cc_error_message").text(response.error.message);
+                                $("#cc_error_row").show();
+                                $("#cc_spinner").removeClass("spinner");
+                                $("#cc_spinner").addClass("spinner-hidden");
+                            } else {
+                                Phonjour.api('paymentInfo', 'saveStripeToken', {stripeToken: response.id})
+                                    .done(function(data) {
+                                            if (data) {
+                                                document.location.href = "/select_phone_number";
+                                            } else {
+                                                $("#cc_error_message").text("Error saving credit info!");
+                                                $("#cc_error_row").show();
+                                            }
+                                        })
+                                    .fail(function(error) {
+                                            $("#cc_error_message").text(error.responseText);
+                                            $("#cc_error_row").show();
+                                        })
+                                    .always(function() {
+                                            $("#cc_spinner").removeClass("spinner");
+                                            $("#cc_spinner").addClass("spinner-hidden");
+                                        });
+                            }
+                        }
+
+                        Stripe.card.createToken({
+                            name: name,
+                            number: cc,
+                            cvc: security,
+                            exp_month: expiryMonth,
+                            exp_year: expiryYear,
+                        }, stripeResponseHandler);
+
+                    }).bind(this);
+                };
+
+                ko.applyBindings(new CreditCardViewModel(), document.getElementById('payment_setup_div'));
+
+                $("#payment_setup_div").keyup(function(event){
+                    if(event.keyCode === 13){
+                        $("#payment_setup_button").click();
+                    }
+                });
+
+            });

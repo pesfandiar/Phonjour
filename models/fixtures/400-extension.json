@@ -1,0 +1,46 @@
+[
+    {
+        "model": "Extension",
+            "data": {
+                "id": 1,
+                "main": true,
+                "PhoneNumber": 1
+             }
+    },
+    {
+        "model": "Extension",
+            "data": {
+                "id": 2,
+                "main": false,
+                "number": 0,
+                "name": "Help Desk",
+                "external_phone_number": "+15005550006",
+                "use_global_schedule": true,
+                "PhoneNumber": 1
+             }
+    },
+    {
+        "model": "Extension",
+            "data": {
+                "id": 3,
+                "main": false,
+                "number": 101,
+                "name": "Head Office",
+                "external_phone_number": "+15005550006",
+                "use_global_schedule": true,
+                "PhoneNumber": 1
+             }
+    },
+    {
+        "model": "Extension",
+            "data": {
+                "id": 4,
+                "main": false,
+                "number": 102,
+                "name": "Major Boss Level 2",
+                "external_phone_number": "+15005550006",
+                "use_global_schedule": true,
+                "PhoneNumber": 1
+             }
+    }
+]

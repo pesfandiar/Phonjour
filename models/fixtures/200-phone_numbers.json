@@ -1,0 +1,15 @@
+[
+    {
+        "model": "PhoneNumber",
+            "data": {
+                "id": 1,
+                "number": "+17788001381",
+                "friendly_name": "(778) 800-1381",
+                "area_code": "778",
+                "country_code": "CA",
+                "type": "LOCAL",
+                "url": "https://www.phonjour.com/twilio/init/48c2cd45-d778-476f-87ed-0d01c9ba2521",
+                "Account": 1
+             }
+    }
+]

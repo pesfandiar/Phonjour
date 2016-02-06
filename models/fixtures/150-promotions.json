@@ -1,0 +1,15 @@
+[
+    {
+        "model": "Promotion",
+            "data": {
+                "id": 1,
+                "code": "TESTPROMO",
+                "description": "Test promotion!",
+                "price_discount": 0.2,
+                "minute_rate_discount": 0.4,
+                "start_date": "2015-01-17 00:00:00",
+                "end_date": "2015-12-12 00:00:00",
+                "Account": 1
+             }
+    }
+]

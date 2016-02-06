@@ -1,0 +1,108 @@
+extends layout
+
+block navbar
+    include navbar
+
+block content
+    #private_beta_div
+        h3 We're still working on Phonjour!
+        .panel.panel-default
+            .panel-body
+                .row
+                    .col-xs-12.col-sm-12
+                        p Please enter your email so we can contact you once Phonjour is open to public.
+                .row.top15
+                    .col-xs-12.col-sm-3
+                        label(for="email_input") Email:
+                    .col-xs-12.col-sm-3
+                        input.form-control(type = "email", data-bind="value: email, valueUpdate: 'afterkeydown'")#email_input
+                .row.top30
+                    .col-xs-12.col-sm-3.col-sm-offset-3
+                        button.btn.btn-primary#private_beta_button(type="button", data-bind="click: saveEmail, enable: email") Contact Me
+                        #private_beta_spinner.spinner-hidden
+                .row.top30.error-message-row#private_beta_error_row
+                    .col-xs-12.col-sm-3.col-sm-offset-3
+                        .alert.alert-danger
+                            span.glyphicon.glyphicon-exclamation-sign
+                            span.left5#private_beta_error_message .
+                .row.top30.error-message-row#private_beta_success_row
+                    .col-xs-12.col-sm-3.col-sm-offset-3
+                        .alert.alert-success
+                            span.glyphicon.glyphicon-ok
+                            span.left5 Thanks for providing your contact information. We will get back to you when Phonjour is open.
+        .panel.panel-default
+            .panel-body
+                .row
+                    .col-xs-12.col-sm-12
+                        p If you have a private beta password, please enter below to see a demo of Phonjour.
+                .row.top15
+                    .col-xs-12.col-sm-3
+                        label(for="password_input") Password:
+                    .col-xs-12.col-sm-3
+                        input.form-control(type = "password", data-bind="value: privateBetaPassword, valueUpdate: 'afterkeydown'")#password_input
+                .row.top30
+                    .col-xs-12.col-sm-3.col-sm-offset-3
+                        button.btn.btn-primary#enter_password_button(type="button", data-bind="click: passwordEntered, enable: privateBetaPassword") Show Me
+        script(type="text/javascript").
+            $(document).ready(function() {
+                function PrivateBetaViewModel() {
+                    this.email = ko.observable("");
+                    this.privateBetaPassword = ko.observable("");
+
+
+                    this.saveEmail = (function() {
+                        var email = this.email();
+
+                        if (!email) {
+                            return;
+                        }
+
+                        $("#private_beta_spinner").removeClass("spinner-hidden");
+                        $("#private_beta_spinner").addClass("spinner");
+                        $("#private_beta_error_row").hide();
+                        $("#private_beta_success_row").hide();
+                        var apiData = {
+                            email: email
+                        };
+                        Phonjour.api('contact', 'saveEmail', apiData)
+                            .done(function(data) {
+                                    if (data && data.success) {
+                                        $("#private_beta_success_row").show();
+                                    } else {
+                                        $("#private_beta_error_message").text("Was not able to save your email!");
+                                        $("#private_beta_error_row").show();
+                                    }
+                                })
+                            .fail(function(error) {
+                                    $("#private_beta_error_message").text("Error in saving your email!");
+                                    $("#private_beta_error_row").show();
+                                })
+                            .always(function() {
+                                    $("#private_beta_spinner").removeClass("spinner");
+                                    $("#private_beta_spinner").addClass("spinner-hidden");
+                                });
+                    }).bind(this);
+
+                    this.passwordEntered = (function() {
+                        var privateBetaPassword = this.privateBetaPassword();
+
+                        if (!privateBetaPassword) {
+                            return;
+                        }
+
+                        document.location.href = "/sign_up?privateBetaPassword=" + privateBetaPassword;
+                    }).bind(this);
+                }
+
+                ko.applyBindings(new PrivateBetaViewModel(), document.getElementById('private_beta_div'));
+
+                $("#private_beta_div").keyup(function(event){
+                    if(event.keyCode === 13){
+                        if ($("#email_input").is(":focus")) {
+                            $("#private_beta_button").click();
+                        } else if ($("#password_input")) {
+                            $("#enter_password_button").click();
+                        }
+                    }
+                });
+            });

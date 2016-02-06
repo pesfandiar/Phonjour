@@ -1,0 +1,404 @@
+extends landing_layout
+
+block landing_content
+    // Header
+    a(name="home")
+    .intro-header
+        .container
+            .row
+                .col-lg-12
+                    .intro-message
+                        iframe(src="https://www.youtube.com/embed/Y2KMkz0zJMI?modestbranding=1&rel=0&showinfo=0&autoplay=1", frameborder="1", allowfullscreen="")
+                        h1 Phonjour
+                        h3 The Receptionist in Your Pocket
+                        hr.intro-divider
+                        ul.list-inline.intro-social-buttons
+                            li
+                                a.btn.btn-primary.btn-lg.fixed-width(href="/sign_up")
+                                    span.network-name Get Started
+                            li OR
+                            li
+                                a.btn.btn-default.btn-lg.fixed-width(href="/sign_in")
+                                    span.network-name Sign In
+                        span.glyphicon.glyphicon-menu-down.top30
+
+    // Features
+    a(name="features")
+    .content-section-b
+        .container
+            .row
+                .col-lg-12
+                    img.img-responsive.center-block.limit-size-more(src="/public/images/logo-large.png", alt="")
+    .content-section-a
+        .container
+            .row
+                .col-lg-5.col-sm-6
+                    hr.section-heading-spacer
+                    .clearfix
+                    h2.section-heading
+                        | DIY Virtual Phone System in The Cloud:
+                    p.lead
+                        | Phonjour lets you easily configure an auto-responding phone system for your business. You will receive a North American local or toll-free number, and you can greet your customers professionally, inform them of your services, and connect them to any of the extensions you have defined for your phone number.
+                .col-lg-5.col-lg-offset-2.col-sm-6
+                    img.img-responsive.limit-size.center-block(src="/public/images/cloud-signal.png", alt="")
+    .content-section-b
+        .container
+            .row
+                .col-lg-5.col-lg-offset-1.col-sm-push-6.col-sm-6
+                    hr.section-heading-spacer
+                    .clearfix
+                    h2.section-heading
+                        | No Expensive Hardware:
+                    p.lead
+                        | You only need your own cellphone(s) or landline(s) to use Phonjour. Your Phonjour number will automatically work on our cloud, and you will receive the calls on your own phone. You can configure Phonjour or listen to voicemails on any internet-enabled device.
+                .col-lg-5.col-sm-pull-6.col-sm-6
+                    img.img-responsive.limit-size.center-block(src="/public/images/responsive-design.png", alt="")
+    .content-section-a
+        .container
+            .row
+                .col-lg-5.col-sm-6
+                    hr.section-heading-spacer
+                    .clearfix
+                    h2.section-heading
+                        | Maintain Work-Life Balance:
+                    p.lead
+                        | Define business hours for your Phonjour phone number, or any of its extensions. You will not receive any calls outside of business hours, and voicemails in your email can wait for the next business day.
+                .col-lg-5.col-lg-offset-2.col-sm-6
+                    img.img-responsive.limit-size.center-block(src="/public/images/sunbathing.png", alt="")
+    .content-section-b
+        .container
+            .row
+                .col-lg-5.col-lg-offset-1.col-sm-push-6.col-sm-6
+                    hr.section-heading-spacer
+                    .clearfix
+                    h2.section-heading
+                        | Cost-Effective, Simple and Smart:
+                    p.lead
+                        | Only pay for a low subscription fee and the minutes you use. As your business grows, you may add or upgrade your minutes add-on to save more on the rates.
+                .col-lg-5.col-sm-pull-6.col-sm-6
+                    img.img-responsive.limit-size.center-block(src="/public/images/growth.png", alt="")
+    .content-section-a
+        .container
+            .row
+                .col-lg-5.col-sm-6
+                    hr.section-heading-spacer
+                    .clearfix
+                    h2.section-heading
+                        | Risk-Free Trial:
+                    p.lead
+                        | Get started with Phonjour by using one of the two trial offers: no monthly subscription fee for the first month, or 50% off on the subscription fee for 3 months.
+                        p.text-center
+                            a.btn.btn-primary.btn-lg(href='/sign_up')
+                                |  Get Started
+                        .top30
+                .col-lg-5.col-lg-offset-2.col-sm-6
+                    img.img-responsive.limit-size.center-block(src="/public/images/flaticon_discount.png", alt="")
+
+    hr
+
+    // Pricing
+    a(name="pricing")
+    .content-section-b
+        .container
+            .row
+                .col-sm-8.col-sm-push-2.text-center
+                    h2 Phone Subscription Pricing
+            .row.top15
+                .col-sm-4.col-sm-offset-2
+                    .well
+                        h2.text-warning.text-center Local
+                        p.text-center
+                            span.label.label-default ECONOMY
+                        hr
+                        ul
+                            li One number in US/Canada (except 907)
+                            li All Phonjour features
+                            li $0.04 per minute
+                            li E-mail support
+                        hr
+                        h3.text-center $5.99 / month
+                        hr
+                        p.text-center
+                            a.btn.btn-primary.btn-lg(href='/sign_up')
+                                |  Get Started
+                .col-sm-4
+                    .well
+                        h2.text-warning.text-center Toll-Free
+                        p.text-center
+                            span.label.label-success POPULAR
+                        hr
+                        ul
+                            li One North American toll-free number
+                            li All Phonjour features
+                            li $0.06 per minute
+                            li E-mail support
+                        hr
+                        h3.text-center $9.99 / month
+                        hr
+                        p.text-center
+                            a.btn.btn-primary.btn-lg(href='/sign_up')
+                                |  Get Started
+
+            hr
+
+            .row
+                .col-sm-10.col-sm-push-1.text-center
+                    h2 Add-on Pricing
+            .row.top15
+                .col-sm-3.col-sm-offset-1
+                    .well
+                        h2.text-warning.text-center 0 Minute
+                        p.text-center
+                            span.label.label-default Starter
+                        hr
+                        p.add-on-copy
+                            | Just pay for minutes according to your plan.
+                        hr
+                        h3.text-center +$0.00 / month
+                        hr
+                        p.text-center
+                            a.btn.btn-primary.btn-lg(href='/sign_up')
+                                |  Get Started
+                .col-sm-3.col-sm-offset-1
+                    .well
+                        h2.text-warning.text-center 200 Minutes
+                        p.text-center
+                            span.label.label-default Growth
+                        hr
+                        p.add-on-copy
+                            | The first 200 minutes are included in every period.
+                        hr
+                        h3.text-center +$6.99 / month
+                        hr
+                        p.text-center
+                            a.btn.btn-primary.btn-lg(href='/sign_up')
+                                |  Get Started
+                .col-sm-3.col-sm-offset-1
+                    .well
+                        h2.text-warning.text-center 500 Minutes
+                        p.text-center
+                            span.label.label-success Best Value
+                        hr
+                        p.add-on-copy
+                            | 500 minutes included in local or toll-free plans. Save up to 47% with a toll-free number.
+                        hr
+                        h3.text-center +$15.99 / month
+                        hr
+                        p.text-center
+                            a.btn.btn-primary.btn-lg(href='/sign_up')
+                                |  Get Started
+
+    hr
+
+    // FAQ
+    a(name="faq")
+    .content-section-a
+        .container
+            .well
+                .row
+                    .col-md-12.text-center
+                        h3 Frequently-Asked Questions
+                .row.top15
+                    .col-md-10.col-md-offset-1
+                        // Nav tabs category
+                        //ul.nav.nav-tabs.faq-cat-tabs
+                        //li.active
+                        //a(href='#faq-cat-1', data-toggle='tab') Category #1
+                        //li
+                        //a(href='#faq-cat-2', data-toggle='tab') Category #2
+
+                        // Tab panes
+                        .tab-content.faq-cat-content
+                            #faq-cat-main.tab-pane.active.in.fade
+                                #accordion-cat-main.panel-group
+                                    .panel.panel-default.panel-faq
+                                        .panel-heading
+                                            a(data-toggle='collapse', data-parent='#accordion-cat-main', href='#faq-cat-main-sub-what')
+                                                h4.panel-title
+                                                    span.faq-question What is Phonjour and how does it work?
+                                                    span.plus-sign-container
+                                                        i.glyphicon.glyphicon-plus
+                                        #faq-cat-main-sub-what.panel-collapse.collapse
+                                            .panel-body
+                                                | Phonjour provides automated telephone services on the cloud. You will get a local or toll-free number on the cloud, and you can easily configure it to greet your customers, connect them to your extensions (your own cellphones or landlines), inform them of your hours, etc.
+                                    .panel.panel-default.panel-faq
+                                        .panel-heading
+                                            a(data-toggle='collapse', data-parent='#accordion-cat-main', href='#faq-cat-main-sub-replace-phone')
+                                                h4.panel-title
+                                                    span.faq-question Does Phonjour replace my cellphone or landline?
+                                                    span.plus-sign-container
+                                                        i.glyphicon.glyphicon-plus
+                                        #faq-cat-main-sub-replace-phone.panel-collapse.collapse
+                                            .panel-body
+                                                | No, but it enhances your phone number(s), and makes your business look larger and more professional. You'll still need your own cellphone or landline to receive calls.
+                                    .panel.panel-default.panel-faq
+                                        .panel-heading
+                                            a(data-toggle='collapse', data-parent='#accordion-cat-main', href='#faq-cat-main-sub-requirements')
+                                                h4.panel-title
+                                                    span.faq-question What do I need to use Phonjour?
+                                                    span.plus-sign-container
+                                                        i.glyphicon.glyphicon-plus
+                                        #faq-cat-main-sub-requirements.panel-collapse.collapse
+                                            .panel-body
+                                                | Phonjour doesn't require any specific device. All you need is a credit card (the only payment method at the time), and at least a cellphone or landline to receive calls. You can use Phonjour's control panel on any device that connects to the internet. You don't need internet connection to receive calls.
+                                    .panel.panel-default.panel-faq
+                                        .panel-heading
+                                            a(data-toggle='collapse', data-parent='#accordion-cat-main', href='#faq-cat-main-sub-where')
+                                                h4.panel-title
+                                                    span.faq-question Where can I use Phonjour?
+                                                    span.plus-sign-container
+                                                        i.glyphicon.glyphicon-plus
+                                        #faq-cat-main-sub-where.panel-collapse.collapse
+                                            .panel-body
+                                                | Your customers can call you from anywhere in the world. You can receive phone calls in US and Canada, except for the 907 area code. You can make calls from your Phonjour number to US/Canada (except 907) too. Your extensions do not have to be in the same city or even country as long as they are in supported areas.
+                                    .panel.panel-default.panel-faq
+                                        .panel-heading
+                                            a(data-toggle='collapse', data-parent='#accordion-cat-main', href='#faq-cat-main-sub-transfer-in')
+                                                h4.panel-title
+                                                    span.faq-question Can I transfer my current phone number to Phonjour?
+                                                    span.plus-sign-container
+                                                        i.glyphicon.glyphicon-plus
+                                        #faq-cat-main-sub-transfer-in.panel-collapse.collapse
+                                            .panel-body
+                                                | Most likely. Please contact us at info@phonjour.com and place a request for a transfer. There will be a one-time charge for the transfer ($30), and it may take 3-4 weeks to be processed.
+                                    .panel.panel-default.panel-faq
+                                        .panel-heading
+                                            a(data-toggle='collapse', data-parent='#accordion-cat-main', href='#faq-cat-main-sub-transfer-out')
+                                                h4.panel-title
+                                                    span.faq-question Can I transfer my Phonjour number to another carrier?
+                                                    span.plus-sign-container
+                                                        i.glyphicon.glyphicon-plus
+                                        #faq-cat-main-sub-transfer-out.panel-collapse.collapse
+                                            .panel-body
+                                                | Yes. If you decide to terminate your Phonjour account, you can contact us at info@phonjour.com BEFORE terminating your account, and arrange a transfer to other carriers. There will be a one-time charge of $30 for transferring out.
+                                    .panel.panel-default.panel-faq
+                                        .panel-heading
+                                            a(data-toggle='collapse', data-parent='#accordion-cat-main', href='#faq-cat-main-sub-change-number')
+                                                h4.panel-title
+                                                    span.faq-question Can I change my phone number after I purchase one?
+                                                    span.plus-sign-container
+                                                        i.glyphicon.glyphicon-plus
+                                        #faq-cat-main-sub-change-number.panel-collapse.collapse
+                                            .panel-body
+                                                | Not at this time. You'll have to terminate your account and create a new one.
+                                    .panel.panel-default.panel-faq
+                                        .panel-heading
+                                            a(data-toggle='collapse', data-parent='#accordion-cat-main', href='#faq-cat-main-sub-trial')
+                                                h4.panel-title
+                                                    span.faq-question Is there any free or discounted trial offers?
+                                                    span.plus-sign-container
+                                                        i.glyphicon.glyphicon-plus
+                                        #faq-cat-main-sub-trial.panel-collapse.collapse
+                                            .panel-body
+                                                | Yes. You can have the subscription fee waived for the first month or 50% discounted for 3 months. You'll see the option when you're picking your Phonjour phone number. Please note that you'll be charged for extra minutes beyond your plan's included minutes.
+                                    .panel.panel-default.panel-faq
+                                        .panel-heading
+                                            a(data-toggle='collapse', data-parent='#accordion-cat-main', href='#faq-cat-main-sub-change-plan')
+                                                h4.panel-title
+                                                    span.faq-question Can I change my plan or add-on later?
+                                                    span.plus-sign-container
+                                                        i.glyphicon.glyphicon-plus
+                                        #faq-cat-main-sub-change-plan.panel-collapse.collapse
+                                            .panel-body
+                                                | You cannot change your phone number at the time, but you can change your add-on at anytime. The new add-on will take effect starting from the next period.
+                                    .panel.panel-default.panel-faq
+                                        .panel-heading
+                                            a(data-toggle='collapse', data-parent='#accordion-cat-main', href='#faq-cat-main-sub-simul-calls')
+                                                h4.panel-title
+                                                    span.faq-question Can I receive multiple calls at the same time?
+                                                    span.plus-sign-container
+                                                        i.glyphicon.glyphicon-plus
+                                        #faq-cat-main-sub-simul-calls.panel-collapse.collapse
+                                            .panel-body
+                                                | Yes. Your Phonjour number can receive any number of calls at the same time, so the only limit is your own cellphone or landline capacity. For instance, if your own cellphone does not support call waiting, you cannot receive more than one call at the same time at the extension connected to your cellphone.
+                                    .panel.panel-default.panel-faq
+                                        .panel-heading
+                                            a(data-toggle='collapse', data-parent='#accordion-cat-main', href='#faq-cat-main-sub-feature-req')
+                                                h4.panel-title
+                                                    span.faq-question You don't have a feature we like. When are you adding it?
+                                                    span.plus-sign-container
+                                                        i.glyphicon.glyphicon-plus
+                                        #faq-cat-main-sub-feature-req.panel-collapse.collapse
+                                            .panel-body
+                                                | Phonjour is in active development, and we are always eager to hear from our current or potential customers. Even though we cannot guarantee development of any requested feature, but we will definitely consider them, so please contact us with your suggestions.
+                                    .panel.panel-default.panel-faq
+                                        .panel-heading
+                                            a(data-toggle='collapse', data-parent='#accordion-cat-main', href='#faq-cat-main-sub-extensions')
+                                                h4.panel-title
+                                                    span.faq-question What are extensions?
+                                                    span.plus-sign-container
+                                                        i.glyphicon.glyphicon-plus
+                                        #faq-cat-main-sub-extensions.panel-collapse.collapse
+                                            .panel-body
+                                                | Your Phonjour number will have extensions just like other corporate numbers. You will be able to define as many extensions as you like. Extensions can be tied to an external phone number (cellphone or landline), or they can only be informational extensions such as business hours or store locations.
+                                    .panel.panel-default.panel-faq
+                                        .panel-heading
+                                            a(data-toggle='collapse', data-parent='#accordion-cat-main', href='#faq-cat-main-sub-billing')
+                                                h4.panel-title
+                                                    span.faq-question How often and how am I charged?
+                                                    span.plus-sign-container
+                                                        i.glyphicon.glyphicon-plus
+                                        #faq-cat-main-sub-billing.panel-collapse.collapse
+                                            .panel-body
+                                                | There is no long-term contract for using Phonjour. You'll be charged month by month, and you can terminate your account at any time without a penalty. At the beginning of each period, you'll be charged the fixed monthly amount for the upcoming month (for your phone subscription and add-ons), and your usage (extra minutes after using your add-ons) for the previous month. All prices are in US dollars, and your bill will be in USD too.
+                                    .panel.panel-default.panel-faq
+                                        .panel-heading
+                                            a(data-toggle='collapse', data-parent='#accordion-cat-main', href='#faq-cat-main-sub-minutes')
+                                                h4.panel-title
+                                                    span.faq-question How are the minutes calculated?
+                                                    span.plus-sign-container
+                                                        i.glyphicon.glyphicon-plus
+                                        #faq-cat-main-sub-minutes.panel-collapse.collapse
+                                            .panel-body
+                                                | Your calling minutes are calculated with high precision (down to seconds), and they will be rounded up to whole minutes. Minutes are calculated separately for each "leg" of your call. For example, if a customer's call is forwarded to an extension, you'll get separate minutes for customer-to-Phonjour and Phonjour-to-extension legs.
+                                    .panel.panel-default.panel-faq
+                                        .panel-heading
+                                            a(data-toggle='collapse', data-parent='#accordion-cat-main', href='#faq-cat-main-sub-terms')
+                                                h4.panel-title
+                                                    span.faq-question What are your terms of service and privacy policy?
+                                                    span.plus-sign-container
+                                                        i.glyphicon.glyphicon-plus
+                                        #faq-cat-main-sub-terms.panel-collapse.collapse
+                                            .panel-body
+                                                | Please find the terms and policies <a href="/terms">here</a>.
+
+    a(name="contact")
+    .banner
+        .container
+            .row
+                .col-lg-4
+                    h2
+                        img.maple-leaf(src="/public/images/maple-leaf.png")
+                        | Made with love in Vancouver, BC
+                .col-lg-8
+                    ul.list-inline.banner-social-buttons
+                        li
+                            a.btn.btn-link.btn-lg.white-link(href="tel://1-844-500-4776") 1-844-500-4PROS (-4776)
+                        li
+                            a.btn.btn-link.btn-lg.white-link(href="mailto:info@phonjour.com") info@phonjour.com
+                        li
+                            a.btn.btn-primary.btn-lg(href="/sign_up")
+                                span.network-name Get Started
+                        li
+                            a.btn.btn-default.btn-lg(href="https://twitter.com/Phonjour")
+                                i.fa.fa-twitter.fa-fw
+                        li
+                            a.btn.btn-default.btn-lg(href="https://facebook.com/Phonjour")
+                                i.fa.fa-facebook.fa-fw
+
+    script(type="text/javascript").
+        $(document).ready(function() {
+            $(".collapse").on("show.bs.collapse", function() {
+                var id = $(this).attr("id");
+                $("a[href='#" + id + "']").closest(".panel-heading").addClass("active-faq");
+                $("a[href='#" + id + "'] .panel-title span.plus-sign-container").html("<i class='glyphicon glyphicon-minus'></i>");
+            });
+            $(".collapse").on("hide.bs.collapse", function() {
+                var id = $(this).attr("id");
+                $("a[href='#" + id + "']").closest(".panel-heading").removeClass("active-faq");
+                $("a[href='#" + id + "'] .panel-title span.plus-sign-container").html("<i class='glyphicon glyphicon-plus'></i>");
+            });
+            $("#navbar-collapse a").click(function() {
+                $("#navbar-collapse").collapse("hide");
+            });
+        });

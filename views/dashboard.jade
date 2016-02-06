@@ -1,0 +1,430 @@
+extends layout
+
+block navbar
+    include navbar
+
+block sidebar
+    include sidebar
+
+block content
+    #dashboard_div
+        .panel.panel-default
+            .panel-body
+                .row
+                    .col-xs-12.col-sm-12
+                        h3 Make a Call
+                .row.top15
+                    .col-xs-12.col-sm-3
+                        label(for="call_from_number_input") From Extension:
+                        span.glyphicon.glyphicon-question-sign.left5(data-toggle="tooltip", title="The call will be connected to this extension's phone number first.")
+                    .col-xs-12.col-sm-3
+                        select.form-control.force-width(data-bind="options: extensions, optionsText: 'caption', optionsValue: 'phoneNumber', value: callFromNumber")
+                    if userStatus == "PURCHASED"
+                        .col-xs-12.col-sm-6.top10(data-bind="visible: !extensions().length")
+                            span.glyphicon.glyphicon-hand-down
+                            span.left5 Please add extensions to make a call
+                    else
+                        .col-xs-12.col-sm-6.top10
+                            if userStatus == "PAYMENT_ON_FILE"
+                                a.left5(href="/select_phone_number") Please pick a phone number to start making calls
+                            else
+                                a.left5(href="/payment_setup") Please pick a phone number to start making calls
+                .row.top15
+                    .col-xs-12.col-sm-3
+                        label(for="call_to_number_input") To:
+                        span.glyphicon.glyphicon-question-sign.left5(data-toggle="tooltip", title="After connecting to the extension's phone number, this number will be called. The call recipient will see your Phonjour number as the caller. Any number in US and Canada is allowed, except for the 907 area code.")
+                    .col-xs-12.col-sm-3
+                        input.form-control(type = "tel", data-bind="value: callToNumber, valueUpdate: 'afterkeydown'")#call_to_number_input
+                .row.top30
+                    .col-xs-12.col-sm-3.col-sm-offset-3
+                        button.btn.btn-primary#make_call_button(type="button", data-bind="click: makeCall, enable: callToNumber() && callFromNumber() && makeCallEnabled()")
+                            span.glyphicon.glyphicon-earphone
+                            span &nbsp;Call
+                        #make_call_spinner.spinner-hidden
+                .row.top30.error-message-row#make_call_error_row
+                    .col-xs-12.col-sm-3.col-sm-offset-3
+                        .alert.alert-danger
+                            span.glyphicon.glyphicon-exclamation-sign
+                            span.left5#make_call_error_message .
+                .row.top30.error-message-row#make_call_success_row
+                    .col-xs-12.col-sm-3.col-sm-offset-3
+                        .alert.alert-success
+                            span.glyphicon.glyphicon-ok
+                            span.left5#make_call_success_message
+                hr
+                .row
+                    .col-xs-12.col-sm-3.bottom15
+                        label(for="do_not_disturb_input") Do Not Disturb:
+                        span.glyphicon.glyphicon-question-sign.left5(data-toggle="tooltip", title="When enabled, business is considered closed, even during the normal business hours. It can be used for unexpected closures, or holidays.")
+                    .col-xs-12.col-sm-3.bottom15
+                        input#do_not_disturb_input.form-control(type="checkbox", data-bind="checked: doNotDisturb")
+                    .col-xs-12.col-sm-6
+                        .alert.alert-warning(data-bind="visible: doNotDisturb")
+                            span.glyphicon.glyphicon-ban-circle
+                            span.left5 You will not receive any calls until you disable "Do Not Disturb".
+        .panel.panel-default
+            .panel-body
+                .row
+                    .col-xs-12.col-sm-12
+                        h3(data-bind="text: 'Recent Calls in \"' + periodRange() + '\":'")
+                .row.top15
+                    .col-xs-12.col-sm-12
+                        span(data-bind="text: usageTitle")
+                .row.top15
+                    .col-xs-12.col-sm-12
+                        .table-responsive
+                            table.table.table-striped
+                                thead
+                                    tr.top-border-thick.bottom-border-thick
+                                        td
+                                            strong Timestamp
+                                        td
+                                            strong From
+                                        td
+                                            strong To
+                                        td
+                                            strong Type
+                                        td
+                                            strong Minutes
+                                        td
+                                            strong Minutes Included
+                                        td
+                                            strong cost
+                                tbody(data-bind="foreach: usageList")
+                                    tr
+                                        td(data-bind = "text: timestamp")
+                                        td(data-bind = "text: fromNumber")
+                                        td(data-bind = "text: toNumber")
+                                        td(data-bind = "text: type")
+                                        td(data-bind = "text: minutes")
+                                        td(data-bind = "text: minutesIncluded")
+                                        td(data-bind = "text: cost")
+                                tr(data-bind="visible: usageList().length === 0").top-border-thick.bottom-border-thick
+                                    td(colspan="7")
+                                        center No calls made in this period yet.
+                                tr(data-bind="visible: usageList().length > 0").top-border-thick
+                                    td(colspan="5").right-align
+                                        strong Minutes Used:
+                                    td(colspan="2")
+                                        span(data-bind="text: minutesUsed")
+                                tr(data-bind="visible: usageList().length > 0")
+                                    td(colspan="5").right-align
+                                        strong Minutes Included:
+                                    td(colspan="2")
+                                        span(data-bind="text: minutesIncluded")
+                                tr(data-bind="visible: usageList().length > 0")
+                                    td(colspan="5").right-align
+                                        strong Usage Fee:
+                                    td(colspan="2")
+                                        span(data-bind="text: usageFee")
+                                tr(data-bind="visible: usageList().length > 0, css: {'bottom-border-thick': !totalFeeDiscounted()}")
+                                    td(colspan="5").right-align
+                                        strong Total Fee:
+                                    td(colspan="2")
+                                        span(data-bind="text: totalFee")
+                                tr(data-bind="visible: usageList().length > 0 && totalFeeDiscounted()").bottom-border-thick
+                                    td(colspan="5").right-align
+                                        strong Total Fee after Promotion:
+                                    td(colspan="2")
+                                        span(data-bind="text: totalFeeDiscounted")
+                        #usage_spinner.spinner-hidden
+                .row.top30.error-message-row#usage_error_row
+                    .col-xs-12.col-sm-6.col-sm-offset-3
+                        .alert.alert-danger
+                            span.glyphicon.glyphicon-exclamation-sign
+                            span.left5#usage_error_message .
+                .row.top15
+                    .col-xs-12.col-sm-3
+                        span Check out usage details and billing info:
+                    .col-xs-12.col-sm-9
+                        a(href="/billing", title="Usage and Billing")
+                            button.btn.btn-primary(type="button").top3 Usage and Billing
+                if userStatus == "PURCHASED"
+                    .row.top15
+                        .col-xs-12.col-sm-3
+                            span View and change your plan settings:
+                        .col-xs-12.col-sm-9
+                            a(href="/plan_settings", title="Plan Settings")
+                                button.btn.btn-primary(type="button").top3 Plan Settings
+                else
+                    .row.top15
+                        .col-xs-12.col-sm-3
+                            span Get started by picking a phone number:
+                        .col-xs-12.col-sm-9
+                            if userStatus == "SIGNED_UP"
+                                a(href="/payment_setup", title="Pick a phone number")
+                                    button.btn.btn-primary(type="button").top3 Pick Phone Number
+                            else
+                                a(href="/select_phone_number", title="Pick a phone number")
+                                    button.btn.btn-primary(type="button").top3 Pick Phone Number
+        .panel.panel-default
+            .panel-body
+                .row
+                    .col-xs-12.col-sm-3
+                        h2 Extensions
+                .row.top15
+                    .col-xs-12.col-sm-12
+                        .table-responsive
+                            table.table.table-striped
+                                thead
+                                    tr.top-border-thick.bottom-border-thick
+                                        td
+                                            strong Extension Number
+                                        td
+                                            strong Name
+                                        td
+                                            strong Phone Number
+                                        td
+                                            strong Edit
+                                tbody(data-bind="foreach: extensions").bottom-border-thick
+                                    tr
+                                        td(data-bind = "text: extension")
+                                        td(data-bind = "text: name")
+                                        td(data-bind = "text: phoneNumber")
+                                        td
+                                            a(data-bind = "attr: {href: editUrl}", title="Edit")
+                                                span.glyphicon.glyphicon-pencil
+                                tr(data-bind="visible: extensions().length === 0").top-border-thick.bottom-border-thick
+                                    td(colspan="4")
+                                        center No extensions added yet. Please click Manage Extensions below!
+                        #extensions_spinner.spinner-hidden
+                .row.top30.error-message-row#extensions_error_row
+                    .col-xs-12.col-sm-6.col-sm-offset-3
+                        .alert.alert-danger
+                            span.glyphicon.glyphicon-exclamation-sign
+                            span.left5#extensions_error_message .
+                .row.top15
+                    .col-xs-12.col-sm-3
+                        span View, add, modify and remove phone number extensions:
+                    .col-xs-12.col-sm-9
+                        a(href="/extensions", title="Manage Extensions")
+                            button.btn.btn-primary(type="button").top3 Manage Extensions
+        .panel.panel-default
+            .panel-body
+                .row
+                    .col-xs-12.col-sm-6
+                        h3 Other Options
+                .row.top15
+                    .col-xs-12.col-sm-3
+                        span Set the business hours and the greetings to be played:
+                    .col-xs-12.col-sm-9
+                        a(href="/extension_settings", title="Manage Main Greetings & Business Hours")
+                            button.btn.btn-primary(type="button").top3 Manage Greetings &amp; Business Hours
+                .row.top15
+                    .col-xs-12.col-sm-3
+                        span General account settings:
+                    .col-xs-12.col-sm-9
+                        a(href="/account_settings", title="Account settings")
+                            button.btn.btn-primary(type="button").top3 Account Settings
+                .row.top15
+                    .col-xs-12.col-sm-3
+                        span Change your credit card information:
+                    .col-xs-12.col-sm-9
+                        a(href="/payment_settings", title="Payment settings")
+                            button.btn.btn-primary(type="button").top3 Payment Settings
+
+        script(type="text/javascript").
+            $(document).ready(function() {
+                var LAST_USAGE_COUNT = 10;
+
+                function DashboardViewModel() {
+                    var self = this;
+                    this.extensions = ko.observableArray();
+
+                    this.doNotDisturb = ko.observable(false);
+                    this._doNotDisturbLoading = false;
+
+                    this.callFromNumber = ko.observable();
+                    this.callToNumber = ko.observable();
+                    this.makeCallEnabled = ko.observable(#{userStatus == 'PURCHASED' ? 'true' : 'false'});
+                    this.usageTitle = ko.observable("Loading...");
+                    this.usageList = ko.observableArray();
+                    this.periodRange = ko.observable("");
+                    this.minutesUsed = ko.observable();
+                    this.minutesIncluded = ko.observable();
+                    this.usageFee = ko.observable();
+                    this.totalFee = ko.observable();
+                    this.totalFeeDiscounted = ko.observable();
+
+                    this.populateExtensions = function() {
+                        $("#extensions_spinner").removeClass("spinner-hidden");
+                        $("#extensions_spinner").addClass("spinner");
+                        $("#extensions_error_row").hide();
+                        Phonjour.api('extension', 'list')
+                            .done(function(data) {
+                                    if (data && data.extensions) {
+                                        self.extensions.removeAll();
+                                        for (var i = 0; i < data.extensions.length; i++) {
+                                            $.extend(data.extensions[i], {
+                                                                            editUrl: "/extensions#" + data.extensions[i].extension,
+                                                                            caption: data.extensions[i].name + " (" + data.extensions[i].phoneNumber + ")"
+                                                                        });
+                                            self.extensions.push(data.extensions[i]);
+                                        }
+                                    } else {
+                                        $("#extensions_error_message").text("Was not able to retrieve extensions!");
+                                        $("#extensions_error_row").show();
+                                    }
+                                })
+                            .fail(function(error) {
+                                    $("#extensions_error_message").text("Was not able to retrieve extensions!");
+                                    $("#extensions_error_row").show();
+                                })
+                            .always(function() {
+                                    $("#extensions_spinner").removeClass("spinner");
+                                    $("#extensions_spinner").addClass("spinner-hidden");
+                                });
+                    }.bind(this);
+
+                    this.populateUsage = function() {
+                        if (#{userStatus == 'PURCHASED' ? 'true' : 'false'}) {
+                            $("#usage_spinner").removeClass("spinner-hidden");
+                            $("#usage_spinner").addClass("spinner");
+                            $("#usage_error_row").hide();
+
+                            Phonjour.api('usage', 'getPeriodData', {lastUsagesCount: LAST_USAGE_COUNT})
+                                .done(function(data) {
+                                        if (data && data.periodData) {
+                                            this.usageTitle("Phone Number: " + data.periodData.phoneNumber);
+                                            this.periodRange(data.periodData.periodStartDate + " - " + data.periodData.periodEndDate);
+                                            this.minutesUsed(data.periodData.minutesUsed);
+                                            this.minutesIncluded(data.periodData.minutesIncluded);
+                                            this.usageFee(data.periodData.usageFee);
+                                            this.totalFee(data.periodData.totalFee);
+                                            this.totalFeeDiscounted(data.periodData.totalFeeDiscounted);
+
+                                            this.usageList.removeAll();
+                                            for (var i = data.periodData.usageList.length - 1; i >= 0 ; i--) {
+                                                this.usageList.push(data.periodData.usageList[i]);
+                                            }
+                                        } else {
+                                            $("#usage_error_message").text("Was not able to retrieve usage data!");
+                                            $("#usage_error_row").show();
+                                        }
+                                    }.bind(this))
+                                .fail(function(error) {
+                                        $("#usage_error_message").text("Was not able to calculate usage data!");
+                                        $("#usage_error_row").show();
+                                    })
+                                .always(function() {
+                                        $("#usage_spinner").removeClass("spinner");
+                                        $("#usage_spinner").addClass("spinner-hidden");
+                                    });
+                        } else {
+                            this.usageTitle("Pick a phone number first to see the last calls here.");
+                            this.periodRange("last month");
+                            this.minutesUsed(0);
+                            this.minutesIncluded(0);
+                            this.usageFee(0);
+                            this.totalFee(0);
+                            this.totalFeeDiscounted(0);
+
+                            this.usageList.removeAll();
+                        }
+                    }.bind(this);
+
+                    this.populateDoNotDisturb = function() {
+                        this._doNotDisturbLoading = true;
+                        $("#make_call_spinner").removeClass("spinner-hidden");
+                        $("#make_call_spinner").addClass("spinner");
+                        Phonjour.api('phoneNumber', 'doNotDisturb')
+                            .done(function(data) {
+                                    if (data && "doNotDisturb" in data) {
+                                        this.doNotDisturb(data.doNotDisturb);
+                                    } else {
+                                        $("#make_call_error_message").text("Was not able to retrieve Do Not Disturb status!");
+                                        $("#make_call_error_row").show();
+                                    }
+                                }.bind(this))
+                            .fail(function(error) {
+                                    $("#make_call_error_message").text("Was not able to retrieve Do Not Disturb status!");
+                                    $("#make_call_error_row").show();
+                                })
+                            .always(function() {
+                                    $("#make_call_spinner").removeClass("spinner");
+                                    $("#make_call_spinner").addClass("spinner-hidden");
+                                    this._doNotDisturbLoading = false;
+                                }.bind(this));
+                    }.bind(this);
+
+                    this.changeDoNotDisturb = function() {
+                        if (this._doNotDisturbLoading) {
+                            return;
+                        }
+                        this._doNotDisturbLoading = true;
+                        $("#make_call_spinner").removeClass("spinner-hidden");
+                        $("#make_call_spinner").addClass("spinner");
+                        $("#make_call_error_row").hide();
+                        var apiData = {
+                            doNotDisturb: this.doNotDisturb() ? "true" : "false"
+                        };
+                        Phonjour.api('phoneNumber', 'doNotDisturb', apiData)
+                            .done(function(data) {
+                                    if (data && "doNotDisturb" in data) {
+                                        this.doNotDisturb(data.doNotDisturb);
+                                    } else {
+                                        $("#make_call_error_message").text("Was not able to change Do Not Disturb status!");
+                                        $("#make_call_error_row").show();
+                                    }
+                                }.bind(this))
+                            .fail(function(error) {
+                                    $("#make_call_error_message").text("Was not able to change Do Not Disturb status!");
+                                    $("#make_call_error_row").show();
+                                })
+                            .always(function() {
+                                    $("#make_call_spinner").removeClass("spinner");
+                                    $("#make_call_spinner").addClass("spinner-hidden");
+                                    this._doNotDisturbLoading = false;
+                                }.bind(this));
+                    }.bind(this);
+
+                    this.doNotDisturb.subscribe(this.changeDoNotDisturb);
+
+                    this.makeCall = function() {
+                        $("#make_call_spinner").removeClass("spinner-hidden");
+                        $("#make_call_spinner").addClass("spinner");
+                        $("#make_call_error_row").hide();
+                        $("#make_call_success_row").hide();
+
+                        var apiData = {
+                            fromNumber: this.callFromNumber(),
+                            toNumber: this.callToNumber()
+                        };
+
+                        Phonjour.api('phoneNumber', 'makeCall', apiData)
+                            .done(function(data) {
+                                    if (data && data.success && data.toNumber) {
+                                        $("#make_call_success_message").text("You will shortly receive a call that will connect you to \"" + data.toNumber + "\".");
+                                        $("#make_call_success_row").show();
+                                        this.callToNumber(data.toNumber);
+                                    } else {
+                                        $("#make_call_error_message").text("Was not able to make a call!");
+                                        $("#make_call_error_row").show();
+                                    }
+                                }.bind(this))
+                            .fail(function(error) {
+                                    $("#make_call_error_message").text(error.responseText);
+                                    $("#make_call_error_row").show();
+                                })
+                            .always(function() {
+                                    $("#make_call_spinner").removeClass("spinner");
+                                    $("#make_call_spinner").addClass("spinner-hidden");
+                                });
+                    }.bind(this);
+
+                }
+
+                var dashboardViewModel = new DashboardViewModel();
+                ko.applyBindings(dashboardViewModel, document.getElementById('dashboard_div'));
+                dashboardViewModel.populateExtensions();
+                dashboardViewModel.populateUsage();
+                dashboardViewModel.populateDoNotDisturb();
+
+                $("#dashboard_div").keyup(function(event){
+                    if(event.keyCode === 13){
+                        if ($("#call_to_number_input").is(":focus")) {
+                            $("#make_call_button").click();
+                        }
+                    }
+                });
+            });

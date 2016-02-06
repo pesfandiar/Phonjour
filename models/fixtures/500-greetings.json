@@ -1,0 +1,22 @@
+[
+    {
+        "model": "Greeting",
+            "data": {
+                "id": 1,
+                "type": "T2S",
+                "text": "Hello. Please enter the extension number you are trying to reach and then press the number sign.",
+                "open": true,
+                "Extension": 1
+             }
+    },
+    {
+        "model": "Greeting",
+            "data": {
+                "id": 2,
+                "type": "T2S",
+                "text": "Hello. We are closed at this time. Please call again during business hours.",
+                "open": false,
+                "Extension": 1
+             }
+    }
+]

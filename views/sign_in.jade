@@ -1,0 +1,87 @@
+extends layout
+
+block navbar
+    include navbar
+
+block content
+    #sign_in_div
+        h3 Sign In to Your Phonjour Account
+        .panel.panel-default
+            .panel-body
+                .row
+                    .col-xs-12.col-sm-3
+                        label(for="email_input") Email:
+                        span.glyphicon.glyphicon-question-sign.left5(data-toggle="tooltip", title="The email you used to sign up.")
+                    .col-xs-12.col-sm-3
+                        input.form-control(type = "email", data-bind="value: email, valueUpdate: 'afterkeydown'")#email_input
+                .row.top15
+                    .col-xs-12.col-sm-3
+                        label(for="password_input") Password:
+                    .col-xs-12.col-sm-3
+                        input.form-control(type = "password", data-bind="value: password, valueUpdate: 'afterkeydown'")#password_input
+                .row.top30
+                    .col-xs-12.col-sm-3.col-sm-offset-3
+                        button.btn.btn-primary#sign_in_button(type="button", data-bind="click: signIn") Sign In
+                        #sign_in_spinner.spinner-hidden
+                .row.top15
+                    .col-xs-12.col-sm-3.col-sm-offset-3
+                        strong
+                            a(href="/sign_up") No account? Sign up here!
+                .row.top15
+                    .col-xs-12.col-sm-3.col-sm-offset-3
+                        a(href="/forgot_password") Forgot password? Recover here!
+                .row.top30.error-message-row#sign_in_error_row
+                    .col-xs-12.col-sm-3.col-sm-offset-3
+                        .alert.alert-danger
+                            span.glyphicon.glyphicon-exclamation-sign
+                            span.left5#sign_in_error_message .
+        script(type="text/javascript").
+            $(document).ready(function() {
+                function SignInViewModel() {
+                    this.email = ko.observable("");
+                    this.password = ko.observable("");
+
+
+                    this.signIn = (function() {
+                        var email = this.email();
+                        var password = this.password();
+
+                        if (!email || !password) {
+                            return;
+                        }
+
+                        $("#sign_in_spinner").removeClass("spinner-hidden");
+                        $("#sign_in_spinner").addClass("spinner");
+                        $("#sign_in_error_row").hide();
+                        var apiData = {
+                            username: email,
+                            password: password
+                        };
+                        Phonjour.api('user', 'signIn', apiData)
+                            .done(function(data) {
+                                    if (data && data.redirectUrl) {
+                                        document.location.href = data.redirectUrl;
+                                    } else {
+                                        $("#sign_in_error_message").text("Was not able to sign in!");
+                                        $("#sign_in_error_row").show();
+                                    }
+                                })
+                            .fail(function(error) {
+                                    $("#sign_in_error_message").text("Username or password incorrect!");
+                                    $("#sign_in_error_row").show();
+                                })
+                            .always(function() {
+                                    $("#sign_in_spinner").removeClass("spinner");
+                                    $("#sign_in_spinner").addClass("spinner-hidden");
+                                });
+                    }).bind(this);
+                }
+
+                ko.applyBindings(new SignInViewModel(), document.getElementById('sign_in_div'));
+
+                $("#sign_in_div").keyup(function(event){
+                    if(event.keyCode === 13){
+                        $("#sign_in_button").click();
+                    }
+                });
+            });

@@ -1,0 +1,277 @@
+extends layout
+
+block navbar
+    include navbar
+
+block sidebar
+    include sidebar
+
+block content
+    #plan_settings_div
+        .panel.panel-default
+            .panel-body
+                .row
+                    .col-xs-12.col-sm-12
+                        h3 Current Plan
+                        #current_plan_spinner.spinner-hidden
+                .row.top15
+                    .col-xs-12.col-sm-3
+                        strong Phone Number:
+                    .col-xs-12.col-sm-3
+                        span(data-bind= "text: phoneNumber")
+                .row.top15
+                    .col-xs-12.col-sm-3
+                        strong Phone Number Type:
+                    .col-xs-12.col-sm-3
+                        span(data-bind= "text: phoneNumberType")
+                .row.top15
+                    .col-xs-12.col-sm-3
+                        strong Monthly Fee:
+                    .col-xs-12.col-sm-3
+                        span(data-bind= "text: currentMonthlyFee")
+                .row.top15
+                    .col-xs-12.col-sm-3
+                        strong Included Minutes:
+                    .col-xs-12.col-sm-3
+                        span(data-bind= "text: currentAddOn")
+                .row.top15
+                    .col-xs-12.col-sm-3
+                        strong Extra Minutes:
+                    .col-xs-12.col-sm-3
+                        span(data-bind= "text: currentMinuteRate")
+                .row.top15
+                    .col-xs-12.col-sm-3
+                        strong Plan Started On:
+                    .col-xs-12.col-sm-3
+                        span(data-bind= "text: currentStartDate")
+                .row.top15
+                    .col-xs-12.col-sm-3
+                        strong Plan Ends On:
+                    .col-xs-12.col-sm-3
+                        span(data-bind= "text: currentEndDate")
+                .row.top30.error-message-row#current_plan_error_row
+                    .col-xs-12.col-sm-3.col-sm-offset-3
+                        .alert.alert-danger
+                            span.glyphicon.glyphicon-exclamation-sign
+                            span.left5#current_plan_error_message .
+        .panel.panel-default(data-bind="visible: futurePlanVisible")
+            .panel-body
+                .row
+                    .col-xs-12.col-sm-12
+                        h3 Future Plan
+                        #future_plan_spinner.spinner-hidden
+                .row.top15
+                    .col-xs-12.col-sm-3
+                        strong Monthly Fee:
+                    .col-xs-12.col-sm-3
+                        span(data-bind= "text: futureMonthlyFee")
+                .row.top15
+                    .col-xs-12.col-sm-3
+                        strong Included Minutes:
+                    .col-xs-12.col-sm-3
+                        span(data-bind= "text: futureAddOn")
+                .row.top15
+                    .col-xs-12.col-sm-3
+                        strong Extra Minutes:
+                    .col-xs-12.col-sm-3
+                        span(data-bind= "text: futureMinuteRate")
+                .row.top15
+                    .col-xs-12.col-sm-3
+                        strong Plan Starts On:
+                    .col-xs-12.col-sm-3
+                        span(data-bind= "text: futureStartDate")
+                .row.top15
+                    .col-xs-12.col-sm-3
+                        strong Plan Ends On:
+                    .col-xs-12.col-sm-3
+                        span(data-bind= "text: futureEndDate")
+                .row.top30
+                    .col-xs-12.col-sm-12
+                        span This plan will start on the specified date above. You can change the plan before it starts using the options below.
+        .panel.panel-default.top15
+            .panel-body
+                .row
+                    .col-xs-12.col-sm-12
+                        h3 Change Plan
+                .row.top15
+                    .col-xs-12.col-sm-3
+                        label(for="add_on_group") Add on:
+                        span.glyphicon.glyphicon-question-sign.left5(data-toggle="tooltip", title="Free minutes in each period (minutes do not carry forward). This will take effect starting from the next period.")
+                    .col-xs-12.col-sm-3
+                        form(role="form", data-bind="foreach: plansList")
+                            .radio
+                                label
+                                    input(type="radio", name="addOn", data-bind="checked: $parent.addOn, checkedValue: planName")
+                                    span(data-bind="text: caption")
+                .row.top30
+                    .col-xs-12.col-sm-3
+                        strong New Plan Will Start On:
+                        span.glyphicon.glyphicon-question-sign.left5(data-toggle="tooltip", title="When the next period starts. The exact cutoff time may be a few hours before or after midnight depending on your timezone.")
+                    .col-xs-12.col-sm-3
+                        span(data-bind= "text: newStartDate")
+                .row.top15
+                    .col-xs-12.col-sm-3
+                        strong Monthly Fee:
+                    .col-xs-12.col-sm-3
+                        span(data-bind= "text: monthlyFee")
+                .row.top15
+                    .col-xs-12.col-sm-3
+                        strong Included Minutes:
+                        span.glyphicon.glyphicon-question-sign.left5(data-toggle="tooltip", title="Number of included minutes per period if you change your plan. Minutes do not carry forward and changing a plan will take effect from the next period.")
+                    .col-xs-12.col-sm-3
+                        span(data-bind= "text: addOn")
+                .row.top15
+                    .col-xs-12.col-sm-3
+                        strong Extra Minutes:
+                    .col-xs-12.col-sm-3
+                        span(data-bind= "text: minuteRate")
+                .row.top30
+                    .col-xs-12.col-sm-12
+                        span The new plan will start on the date specified above. Current period's bill will be calculated based on the current plan.
+                .row.top30
+                    .col-xs-12.col-sm-3.col-sm-offset-3
+                        button.btn.btn-primary(type="button", data-bind="click: changePlan") Change Plan
+                        #change_plan_spinner.spinner-hidden
+                .row.top15
+                    .col-xs-12.col-sm-3.col-sm-offset-3
+                        button.btn.btn-default(type="button", data-bind="click: back") Back
+                .row.top15
+                    .col-xs-12.col-sm-3.col-sm-offset-3
+                        a(href="/terminate")
+                            button.btn.btn-link(type="button") Terminate Account
+                .row.top30.error-message-row#change_plan_error_row
+                    .col-xs-12.col-sm-3.col-sm-offset-3
+                        .alert.alert-danger
+                            span.glyphicon.glyphicon-exclamation-sign
+                            span.left5#change_plan_error_message .
+        script(type="text/javascript").
+            $(document).ready(function() {
+                // Plan information
+                #{planInitialization}
+
+                function PlanSettingsModelView() {
+                    var self = this;
+
+                    this.phoneNumber = ko.observable();
+                    this.phoneNumberType = ko.observable();
+                    this.tollFree = ko.observable();
+                    this.newStartDate = ko.observable();
+
+                    this.addOn = ko.observable("0");
+
+                    this.currentMonthlyFee = ko.observable();
+                    this.currentAddOn = ko.observable();
+                    this.currentMinuteRate = ko.observable();
+                    this.currentStartDate = ko.observable();
+                    this.currentEndDate = ko.observable();
+
+                    this.futurePlanVisible = ko.observable(false);
+                    this.futureMonthlyFee = ko.observable();
+                    this.futureAddOn = ko.observable();
+                    this.futureMinuteRate = ko.observable();
+                    this.futureStartDate = ko.observable();
+                    this.futureEndDate = ko.observable();
+
+                    this.monthlyFee = ko.pureComputed(function() {
+                            var fee = this.tollFree() === "true" ? PLAN_RATES.TOLL_FREE : PLAN_RATES.LOCAL;
+                            fee = fee.plus(ADDON_MONTHLY_RATES[this.addOn()]);
+                            return "$" + fee.toFormat(2);
+                        }, this);
+
+                    this.minuteRate = ko.pureComputed(function() {
+                            return (this.tollFree() === "true" ?
+                                                    MINUTE_RATE.TOLL_FREE.times(100).toFixed(0) :
+                                                    MINUTE_RATE.LOCAL.times(100).toFixed(0))
+                                                        + " ¢/min";
+                        }, this);
+
+                    this.plansList = ko.observableArray($.map(ADDON_MONTHLY_RATES, function(planRate, planName) {
+                                                                                        return {
+                                                                                            caption: planName === "0" ?
+                                                                                                        "None" :
+                                                                                                        ADDON_MINUTES[planName] + " min for $" + planRate.toFixed(2),
+                                                                                            planName: planName
+                                                                                        };
+                                                                                    }));
+
+                    this.back = function() {
+                        window.history.back();
+                    };
+
+                    this.populatePlans = (function(){
+                            $("#current_plan_spinner").removeClass("spinner-hidden");
+                            $("#current_plan_spinner").addClass("spinner");
+                            $("#current_plan_error_message").hide();
+
+                            Phonjour.api('plan', 'getPlans')
+                                .done(function(data) {
+                                        if (data && data.data) {
+                                            this.phoneNumber(data.data.phoneNumber);
+                                            this.phoneNumberType(data.data.phoneNumberType);
+
+                                            this.newStartDate(data.data.newStartDate);
+
+                                            this.currentMonthlyFee(data.data.currentPlan.monthlyFee);
+                                            this.currentAddOn(data.data.currentPlan.addOn);
+                                            this.currentMinuteRate(data.data.currentPlan.minuteRate);
+                                            this.currentStartDate(data.data.currentPlan.startDate);
+                                            this.currentEndDate(data.data.currentPlan.endDate);
+
+                                            if (data.data.futurePlan) {
+                                                this.futurePlanVisible(true);
+                                                this.futureMonthlyFee(data.data.futurePlan.monthlyFee);
+                                                this.futureAddOn(data.data.futurePlan.addOn);
+                                                this.futureMinuteRate(data.data.futurePlan.minuteRate);
+                                                this.futureStartDate(data.data.futurePlan.startDate);
+                                                this.futureEndDate(data.data.futurePlan.endDate);
+                                            } else {
+                                                this.futurePlanVisible(false);
+                                            }
+                                        } else {
+                                            $("#current_plan_error_message").text("Error updating the plan!");
+                                            $("#current_plan_error_row").show();
+                                        }
+                                    }.bind(this))
+                                .fail(function(error) {
+                                        $("#current_plan_error_message").text(error.responseText);
+                                        $("#current_plan_error_row").show();
+                                    })
+                                .always(function() {
+                                        $("#current_plan_spinner").removeClass("spinner");
+                                        $("#current_plan_spinner").addClass("spinner-hidden");
+                                    });
+                        }).bind(this);
+
+                    this.changePlan = (function() {
+                            var addOn = this.addOn();
+
+                            if (addOn) {
+                                $("#change_plan_spinner").removeClass("spinner-hidden");
+                                $("#change_plan_spinner").addClass("spinner");
+                                $("#change_plan_error_message").hide();
+
+                                Phonjour.api('plan', 'changePlan', {addOn: addOn})
+                                    .done(function(data) {
+                                            if (data && data.success) {
+                                                this.populatePlans();
+                                            } else {
+                                                $("#change_plan_error_message").text("Error updating the plan!");
+                                                $("#change_plan_error_row").show();
+                                            }
+                                        }.bind(this))
+                                    .fail(function(error) {
+                                            $("#change_plan_error_message").text("Error changing the plan!");
+                                            $("#change_plan_error_row").show();
+                                        })
+                                    .always(function() {
+                                            $("#change_plan_spinner").removeClass("spinner");
+                                            $("#change_plan_spinner").addClass("spinner-hidden");
+                                        });
+                            }
+                        }).bind(this);
+                };
+
+                var planSettingsModelView = new PlanSettingsModelView();
+                ko.applyBindings(planSettingsModelView, document.getElementById('plan_settings_div'));
+                planSettingsModelView.populatePlans();
+            });

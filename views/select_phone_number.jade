@@ -1,0 +1,311 @@
+extends layout
+
+block navbar
+    include navbar
+
+block content
+    #phone_selection_div
+        h3 Select and Purchase Your Phone Number
+        .panel.panel-default
+            .panel-body
+                .row
+                    .col-xs-12.col-sm-3
+                        label(for="toll_free_form") Phone Number Type:
+                        span.glyphicon.glyphicon-question-sign.left5(data-toggle="tooltip", title="Toll-free numbers look more professional, and do not cost your customers anything to call you.")
+                    .col-xs-12.col-sm-3
+                        form#toll_free_form(role="form")
+                            .radio
+                                label
+                                    input#toll_free_input(type="radio", name="tollFree", value="true", data-bind="checked: tollFree")
+                                    span(data-bind="text: tollFreeText()")
+                            .radio
+                                label
+                                    input#local_input(type="radio", name="tollFree", value="false", data-bind="checked: tollFree")
+                                    span(data-bind="text: localText()")
+                .row.top15
+                    .col-xs-12.col-sm-3
+                        label(for="country_code_group") Country:
+                    .col-xs-12.col-sm-3
+                        .btn-group#country_code_group(data-toggle="buttons")
+                            label.btn.btn-default#usa_label(data-bind="css: {active: countryCode() === 'US'}, click: countryCodeClicked")
+                                input#usa_input(type="radio", name="countryCode", value="US", data-bind="checked: countryCode, event:{change: countryCodeChanged}")
+                                span United States
+                            label.btn.btn-default#canada_label(data-bind="css: {active: countryCode() === 'CA'}, click: countryCodeClicked")
+                                input#canada_input(type="radio", name="countryCode", value="CA", data-bind="checked: countryCode, event:{change: countryCodeChanged}")
+                                span Canada
+                .row.top15
+                    .col-xs-12.col-sm-3
+                        label(for="area_code_input", data-bind="text: areaCodeCaption")
+                        span.glyphicon.glyphicon-question-sign.left5(data-bind="visible: tollFree() === 'false'", data-toggle="tooltip", title="The 3-digit area code of your Phonjour number. All area codes in US and Canada are allowed, except for 907.")
+                        span.glyphicon.glyphicon-question-sign.left5(data-bind="visible: tollFree() !== 'false'", data-toggle="tooltip", title="Toll-free prefix. We may not have some of the older prefixes available.")
+                    .col-xs-12.col-sm-3
+                        input#area_code_input.form-control(type="text", name="areaCode", placeholder="3-digit prefix", data-bind="visible: tollFree() === 'false', value: areaCode, event:{change: areaCodeChanged}")
+                        select.form-control(data-bind="visible: tollFree() === 'true', options: tollFreePrefixes, value: tollFreePrefix, event:{change: tollFreePrefixChanged}")
+                .row.top15
+                    .col-xs-12.col-sm-3
+                        label(for="phone_selection_input") Phone Number:
+                        span.glyphicon.glyphicon-question-sign.left5(data-toggle="tooltip", title="List of available Phonjour numbers based on your selections. Please change the selection criteria if you do not see any numbers or you do not like the current ones.  To transfer your existing phone number to Phonjour please contact us.")
+                    .col-xs-12.col-sm-3
+                        select.form-control#phone_selection_input(data-bind="options: phoneNumbers, value: phoneNumber")
+                        span#search_phone_numbers_spinner.spinner-hidden
+                    .col-xs-12.col-sm-6(data-bind="visible: phoneNumbers().length === 0")
+                        span.top10.glyphicon.glyphicon-hand-up
+                        span.top10.left5 Please change the options to see a list of available phones
+        .panel.panel-default.top15
+            .panel-body
+                .row
+                    .col-xs-12.col-sm-3
+                        label(for="add_on_group") Add on:
+                        span.glyphicon.glyphicon-question-sign.left5(data-toggle="tooltip", title="This option will add free minutes to each period (minutes do not carry forward). Add-ons are a much better deal for toll-free numbers.")
+                    .col-xs-12.col-sm-3
+                        form(role="form", data-bind="foreach: plansList")
+                            .radio
+                                label
+                                    input(type="radio", name="addOn", data-bind="checked: $parent.addOn, checkedValue: planName")
+                                    span(data-bind="text: caption")
+        .panel.panel-default.top15
+            .panel-body
+                .row
+                    .col-xs-12.col-sm-3
+                        strong Phone Number:
+                        span.glyphicon.glyphicon-question-sign.left5(data-toggle="tooltip", title="This will be your permanent Phonjour number. To transfer your existing phone number to Phonjour please contact us.")
+                    .col-xs-12.col-sm-3
+                        span(data-bind= "text: phoneNumber")
+                .row.top15
+                    .col-xs-12.col-sm-3
+                        strong Setup Fee:
+                    .col-xs-12.col-sm-3
+                        span $0
+                .row.top15
+                    .col-xs-12.col-sm-3
+                        strong Monthly Fee:
+                    .col-xs-12.col-sm-3
+                        span(data-bind= "text: monthlyFee")
+                .row.top15
+                    .col-xs-12.col-sm-3
+                        strong Included Minutes:
+                    .col-xs-12.col-sm-3
+                        span(data-bind= "text: addOn")
+                .row.top15
+                    .col-xs-12.col-sm-3
+                        strong Extra Minutes:
+                    .col-xs-12.col-sm-3
+                        span(data-bind= "text: minuteRate")
+                .row.top15
+                    .col-xs-12.col-sm-3
+                        strong(for="promotion_group") Promotion:
+                        span.glyphicon.glyphicon-question-sign.left5(data-toggle="tooltip", title="Please select one of the offered promotions, or use your own single-use private coupon that you received from one of our representives.")
+                    .col-xs-12.col-sm-3
+                        form(role="form", data-bind="foreach: promotionList")
+                            .radio
+                                label
+                                    input(type="radio", name="promotion", data-bind="checked: $parent.promotion, checkedValue: code")
+                                    span(data-bind="text: description")
+                .row(data-bind="visible: promotion() === null")
+                    .col-xs-12.col-sm-3.col-sm-offset-3
+                        input.form-control(data-bind="value: customPromotion")
+                .row.top30
+                    .col-xs-12.col-sm-3
+                        strong I agree to the&nbsp;
+                            a(href="/terms", target="_blank") terms
+                            span :
+                    .col-xs-12.col-sm-3
+                        input.form-control(type="checkbox", data-bind= "checked: agreeToTerms")
+                .row.top30
+                    .col-xs-12.col-sm-3.col-sm-offset-3
+                        button.btn.btn-primary(type="button", data-bind="click: buyNumber, enable: phoneNumber() && agreeToTerms()") Sign Up
+                        #buy_phone_number_spinner.spinner-hidden
+                .row.top15
+                    .col-xs-12.col-sm-3.col-sm-offset-3
+                        a(href="/dashboard")
+                            button.btn.btn-default(type="button") Just Take Me to The Dashboard
+                .row.top30.error-message-row#phone_error_row
+                    .col-xs-12.col-sm-3.col-sm-offset-3
+                        .alert.alert-danger
+                            span.glyphicon.glyphicon-exclamation-sign
+                            span.left5#phone_error_message .
+        script(type="text/javascript").
+            $(document).ready(function() {
+                // Plans information
+                #{planInitialization}
+                // Promotions information
+                #{promotionInitialization}
+
+                function SelectPhoneModelView() {
+                    var self = this;
+                    this.tollFree = ko.observable("true");
+                    this.countryCode = ko.observable("US");
+                    this.areaCode = ko.observable();
+                    this.phoneNumbers = ko.observableArray();
+                    this.phoneNumber = ko.observable();
+                    this.addOn = ko.observable("0");
+                    this.agreeToTerms = ko.observable(false);
+                    this.tollFreePrefix = ko.observable("");
+                    this.tollFreePrefixes = ko.observableArray([
+                            "",
+                            "855",
+                            "844",
+                            "800",
+                            "888",
+                            "877",
+                            "866",
+                        ]);
+                    this.monthlyFee = ko.pureComputed(function() {
+                            var fee = this.tollFree() === "true" ? PLAN_RATES.TOLL_FREE : PLAN_RATES.LOCAL;
+                            fee = fee.plus(ADDON_MONTHLY_RATES[this.addOn()]);
+                            return "$" + fee.toFormat(2);
+                        }, this);
+                    this.minuteRate = ko.pureComputed(function() {
+                            return (this.tollFree() === "true" ?
+                                                    MINUTE_RATE.TOLL_FREE.times(100).toFixed(0) :
+                                                    MINUTE_RATE.LOCAL.times(100).toFixed(0))
+                                                        + " ¢/min";
+                        }, this);
+                    this.areaCodeCaption = ko.pureComputed(function() {
+                            return (this.tollFree() === "true" ? "Toll-Free Prefix:" : "Area Code:");
+                        }, this);
+
+
+                    this.tollFreeText = function() {
+                        return "Toll Free ($" + PLAN_RATES.TOLL_FREE.toFixed(2) + "/mo + " + MINUTE_RATE.TOLL_FREE.times(100).toFixed(0) + "¢/min)";
+                    };
+
+                    this.localText = function() {
+                        return "Local ($" + PLAN_RATES.LOCAL.toFixed(2) + "/mo + " + MINUTE_RATE.LOCAL.times(100).toFixed(0) + "¢/min)";
+                    };
+
+                    this.plansList = ko.observableArray($.map(ADDON_MONTHLY_RATES, function(planRate, planName) {
+                                                                                        return {
+                                                                                            caption: planName === "0" ?
+                                                                                                        "None" :
+                                                                                                        ADDON_MINUTES[planName] + " min for $" + planRate.toFixed(2),
+                                                                                            planName: planName
+                                                                                        };
+                                                                                    }));
+
+                    this.promotion = ko.observable();
+                    this.customPromotion = ko.observable();
+                    this.promotionList = ko.observableArray($.map(PROMOTIONS, function(description, code) {
+                                                                                    return {
+                                                                                        code: code,
+                                                                                        description: description
+                                                                                    }
+                                                                                }));
+                    this.promotionList.push({code: null, description: "Your own private coupon"});
+
+                    var searchPhoneNumbers = (function() {
+                            var areaCode = this.areaCode();
+                            var countryCode = this.countryCode();
+                            var tollFree = this.tollFree();
+                            var apiData = {areaCode: areaCode, countryCode: countryCode};
+                            if (tollFree === "true") {
+                                apiData.tollFree = true;
+                            }
+
+                            this.phoneNumbers.removeAll();
+                            this.phoneNumber('');
+                            if (areaCode && areaCode.length > 0) {
+                                $("#search_phone_numbers_spinner").removeClass("spinner-hidden");
+                                $("#search_phone_numbers_spinner").addClass("spinner");
+                                Phonjour.api('phoneNumber', 'available', apiData)
+                                    .done(function(data) {
+                                            if (data && data.numbers) {
+                                                for (var index = 0; index < data.numbers.length; index++) {
+                                                    var phoneNumber = data.numbers[index].friendlyName;
+                                                    self.phoneNumbers.push(phoneNumber);
+                                                }
+                                            }
+                                        })
+                                    .always(function() {
+                                            $("#search_phone_numbers_spinner").removeClass("spinner");
+                                            $("#search_phone_numbers_spinner").addClass("spinner-hidden");
+                                        });
+                            }
+                        }).bind(this);
+
+                    this.tollFree.subscribe(function(newTollFree) {
+                            if (newTollFree === "true") {
+                                this.tollFreePrefixChanged();
+                            } else {
+                                this.areaCodeChanged();
+                            }
+                        }.bind(this));
+
+                    var countryLabelToIso = {
+                        usa_label: "US",
+                        canada_label: "CA"
+                    };
+
+                    this.countryCodeClicked = (function(viewModel, event) {
+                            var countryCode = countryLabelToIso[event.currentTarget.id];
+                            if (countryCode) {
+                                this.countryCode(countryCode);
+                                this.countryCodeChanged();
+                            }
+                        }).bind(this);
+
+                    this.countryCodeChanged = (function() {
+                            var areaCode = this.areaCode();
+                            var countryCode = this.countryCode();
+                            if (areaCode && areaCode.length === 3) {
+                                searchPhoneNumbers();
+                            } else {
+                                this.areaCode('');
+                            }
+                        }).bind(this);
+
+                    this.areaCodeChanged = (function() {
+                            var areaCode = this.areaCode();
+                            var tollFree = this.tollFree() === "true";
+                            if (areaCode && areaCode.length === 3) {
+                                searchPhoneNumbers();
+                            }
+                        }).bind(this);
+
+                    this.tollFreePrefixChanged = (function() {
+                            var tollFreePrefix = this.tollFreePrefix();
+                            this.areaCode(tollFreePrefix);
+                            this.areaCodeChanged();
+                        }).bind(this);
+
+                    this.buyNumber = (function() {
+                            var phoneNumber = this.phoneNumber();
+                            var tollFree = this.tollFree() === "true";
+                            var addOn = this.addOn();
+                            var promotion = this.promotion() || this.customPromotion();
+
+                            if (phoneNumber) {
+                                $("#buy_phone_number_spinner").removeClass("spinner-hidden");
+                                $("#buy_phone_number_spinner").addClass("spinner");
+                                $("#phone_error_row").hide();
+                                var apiData = {
+                                    phoneNumber: phoneNumber,
+                                    addOn: addOn,
+                                    promotion: promotion
+                                };
+                                if (tollFree) {
+                                    apiData.tollFree = true;
+                                }
+                                Phonjour.api('phoneNumber', 'buyPhoneNumber', apiData)
+                                    .done(function(data) {
+                                            if (data && data.success) {
+                                                document.location.href = "/dashboard";
+                                            } else {
+                                                $("#phone_error_message").text("Error buying a phone number!");
+                                                $("#phone_error_row").show();
+                                            }
+                                        })
+                                    .fail(function(error) {
+                                            $("#phone_error_message").text(error.responseText);
+                                            $("#phone_error_row").show();
+                                        })
+                                    .always(function() {
+                                            $("#buy_phone_number_spinner").removeClass("spinner");
+                                            $("#buy_phone_number_spinner").addClass("spinner-hidden");
+                                        });
+                            }
+                        }).bind(this);
+                };
+
+                ko.applyBindings(new SelectPhoneModelView(), document.getElementById('phone_selection_div'));
+            });

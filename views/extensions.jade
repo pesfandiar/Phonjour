@@ -1,0 +1,245 @@
+extends layout
+
+block navbar
+    include navbar
+
+block sidebar
+    include sidebar
+
+block content
+    #extensions_div
+        h3 Extensions
+        .panel.panel-default
+            .panel-body
+                .panel-group#extensions_accordion(data-bind = "foreach: extensions")
+                    .panel.panel-default
+                        .panel-heading
+                            h4.panel-title
+                                a(data-toggle="collapse", data-parent="#extensions_accordion", data-bind ="attr: {href: href}, text: 'Extension #' + extension() + ': ' + name()")
+                        .panel-collapse.collapse(data-bind="attr: {id: domId}, css: {in: collapsed}")
+                            .panel-body
+                                .row
+                                    .col-xs-12.col-sm-3
+                                        label(for="extension_input") Extension:
+                                        span.glyphicon.glyphicon-question-sign.left5(data-toggle="tooltip", title="The extension number.")
+                                    .col-xs-12.col-sm-3
+                                        input#extension_input.form-control(type = "number", data-bind="value: extension, valueUpdate: 'afterkeydown'")
+                                .row.top15
+                                    .col-xs-12.col-sm-3
+                                        label(for="name_input") Name:
+                                        span.glyphicon.glyphicon-question-sign.left5(data-toggle="tooltip", title="A name for your extension. e.g. a person's name, or a department")
+                                    .col-xs-12.col-sm-3
+                                        input#name_input.form-control(type = "text", data-bind="value: name, valueUpdate: 'afterkeydown'")
+                                .row.top15
+                                    .col-xs-12.col-sm-3
+                                        label(for="phone_number_input") Phone Number:
+                                        span.glyphicon.glyphicon-question-sign.left5(data-toggle="tooltip", title="The external phone number that this extension connects to. This can be any number in US or Canada, except for the 907 area code.")
+                                    .col-xs-12.col-sm-3
+                                        input#phone_number_input.form-control(type = "text", data-bind="value: phoneNumber, valueUpdate: 'afterkeydown'")
+                                .row.top30
+                                    .col-xs-6.col-sm-2.col-sm-offset-3
+                                        button.btn.btn-primary(type="button", data-bind="click: saveExtension, enable: dirty() && name() && extension() && phoneNumber()") Save
+                                        .save_extension_spinner.spinner-hidden.top15
+                                    .col-xs-6.col-sm-2
+                                        button.btn.btn-danger(type="button", data-bind="click: deleteExtension") Delete
+                                        .delete_extension_spinner.spinner-hidden.top15
+                                .row.top10
+                                    .col-xs-6.col-sm-2.col-sm-offset-3
+                                        button.btn.btn-primary(type="button", data-bind="click: editGreetings, enable: !justCreated() && extensionId() >= 0") Manage Greetings &amp; Schedules
+                                .row.top30.error-message-row.extension_error_row
+                                    .col-xs-12.col-sm-6.col-sm-offset-3
+                                        .alert.alert-danger
+                                            span.glyphicon.glyphicon-exclamation-sign
+                                            span.left5.extension_error_message .
+
+                #extensions_spinner.spinner-hidden
+                .row.top30.error-message-row#extensions_error_row
+                    .col-xs-12.col-sm-6.col-sm-offset-3
+                        .alert.alert-danger
+                            span.glyphicon.glyphicon-exclamation-sign
+                            span.left5#extensions_error_message .
+                .row.top15(data-bind="visible: extensions().length === 0")
+                    .col-xs-12.col-sm-6.col-sm-offset-3
+                        span.top10.glyphicon.glyphicon-hand-down
+                        span.top10.left5 No extensions found. Please add some and save them!
+                .row.top15
+                    .col-xs-12.col-sm-3.col-sm-offset-3
+                        button.btn.btn-primary(type="button", data-bind="click: addExtension") Add Extension
+                .row.top15
+                    .col-xs-12.col-sm-3.col-sm-offset-3
+                        button.btn.btn-default(type="button", data-bind="click: back") Back
+
+        script(type="text/javascript").
+            $(document).ready(function() {
+                function ExtensionsViewModel() {
+                    var self = this;
+                    var lastPhoneNumber, lastExtension;
+                    this.extensions = ko.observableArray();
+
+                    function ExtensionViewModel(dataItem, collapsed, justCreated) {
+                        this.extensionId = ko.observable(dataItem.extensionId);
+                        this.extension = ko.observable(dataItem.extension);
+                        this.name = ko.observable(dataItem.name);
+                        this.phoneNumber = ko.observable(dataItem.phoneNumber);
+                        this.dirty = ko.observable(!!justCreated);
+                        this.justCreated = ko.observable(!!justCreated);
+
+                        var makeDirty = function() {
+                            this.dirty(true);
+                        }.bind(this);
+                        this.extension.subscribe(makeDirty);
+                        this.name.subscribe(makeDirty);
+                        this.phoneNumber.subscribe(makeDirty);
+
+                        var randomNumber = Math.random().toString().substr(2);
+
+                        var domId = "extension-panel-" + dataItem.extension;
+                        this.domId = ko.computed(function() {
+                                return "extension-panel-" + this.extension() + "-" + randomNumber;
+                            }.bind(this));
+                        this.href = ko.computed(function() {
+                                return "#" + this.domId();
+                            }.bind(this));
+                        this.collapsed = collapsed;
+
+                        this.saveExtension = function(extensionsViewModel, event) {
+                            var extensionContainer = $(event.target).closest(".panel-body");
+                            extensionContainer.find(".save_extension_spinner").removeClass("spinner-hidden");
+                            extensionContainer.find(".save_extension_spinner").addClass("spinner");
+                            extensionContainer.find(".extension_error_row").hide();
+                            Phonjour.api('extension', 'save', {
+                                extensionId: this.extensionId(),
+                                extension: this.extension(),
+                                name: this.name(),
+                                externalPhoneNumber: this.phoneNumber()
+                            }).done(function(data) {
+                                    if (data) {
+                                        this.extensionId(data.extensionId);
+                                        this.extension(data.extension);
+                                        this.name(data.name);
+                                        this.phoneNumber(data.phoneNumber);
+                                        this.dirty(false);
+                                        this.justCreated(false);
+                                    } else {
+                                        extensionContainer.find(".extension_error_message").text("Was not able to save extension!");
+                                        extensionContainer.find(".extension_error_row").show();
+                                    }
+                                }.bind(this))
+                            .fail(function(error) {
+                                    extensionContainer.find(".extension_error_message").text(error.responseText);
+                                    extensionContainer.find(".extension_error_row").show();
+                                })
+                            .always(function() {
+                                    extensionContainer.find(".save_extension_spinner").removeClass("spinner");
+                                    extensionContainer.find(".save_extension_spinner").addClass("spinner-hidden");
+                                });
+
+                        }.bind(this);
+
+                        this.deleteExtension = function() {
+                            var extensionId = this.extensionId();
+                            if (this.justCreated() || this.extensionId() < 0) {
+                                self.extensions.remove(this);
+                                return;
+                            }
+
+                            var extensionContainer = $(event.target).closest(".panel-body");
+                            extensionContainer.find(".delete_extension_spinner").removeClass("spinner-hidden");
+                            extensionContainer.find(".delete_extension_spinner").addClass("spinner");
+                            extensionContainer.find(".extension_error_row").hide();
+                            Phonjour.api('extension', 'delete', {
+                                extensionId: extensionId
+                            }).done(function(data) {
+                                    if (data && data.success) {
+                                        self.extensions.remove(this);
+                                    } else {
+                                        extensionContainer.find(".extension_error_message").text("Was not able to delete extension!");
+                                        extensionContainer.find(".extension_error_row").show();
+                                    }
+                                }.bind(this))
+                            .fail(function(error) {
+                                    extensionContainer.find(".extension_error_message").text(error.responseText);
+                                    extensionContainer.find(".extension_error_row").show();
+                                })
+                            .always(function() {
+                                    extensionContainer.find(".delete_extension_spinner").removeClass("spinner");
+                                    extensionContainer.find(".delete_extension_spinner").addClass("spinner-hidden");
+                                });
+
+                        }.bind(this);
+
+                        this.editGreetings = function() {
+                            if (this.justCreated() || this.extensionId() < 0) {
+                                return;
+                            }
+
+                            window.location.href = "/extension_settings#" + this.extensionId();
+                        }.bind(this);
+                    }
+
+                    this.populateExtensions = function() {
+                        $("#extensions_spinner").removeClass("spinner-hidden");
+                        $("#extensions_spinner").addClass("spinner");
+                        $("#extensions_error_row").hide();
+                        var bookmark = window.location.hash.split("#")[1];
+                        Phonjour.api('extension', 'list')
+                            .done(function(data) {
+                                    if (data && data.extensions) {
+                                        self.extensions.removeAll();
+                                        var anyCollapsed = false;
+                                        for (var i = 0; i < data.extensions.length; i++) {
+                                            var collapsed = bookmark === data.extensions[i].extension;
+                                            var extension = new ExtensionViewModel(data.extensions[i], collapsed, false);
+                                            self.extensions.push(extension);
+                                            anyCollapsed = anyCollapsed || collapsed;
+                                        }
+                                        if (data.extensions.length) {
+                                            lastExtension = data.extensions[data.extensions.length - 1].extension;
+                                            lastPhoneNumber = data.extensions[data.extensions.length - 1].phoneNumber;
+
+                                            if (!anyCollapsed) {
+                                                var extensions = self.extensions();
+                                                $("#" + extensions[extensions.length - 1].domId()).collapse("show");
+                                            }
+                                            $("[data-toggle='tooltip']").tooltip();
+                                        } else {
+                                            lastExtension = 0;
+                                            lastPhoneNumber = "";
+                                        }
+                                    } else {
+                                        $("#extensions_error_message").text("Was not able to retrieve extensions!");
+                                        $("#extensions_error_row").show();
+                                    }
+                                })
+                            .fail(function(error) {
+                                    $("#extensions_error_message").text("Was not able to retrieve extensions!");
+                                    $("#extensions_error_row").show();
+                                })
+                            .always(function() {
+                                    $("#extensions_spinner").removeClass("spinner");
+                                    $("#extensions_spinner").addClass("spinner-hidden");
+                                });
+                    }.bind(this);
+
+                    this.addExtension = function() {
+                        $("#extensions_error_row").hide();
+                        this.extensions.push(new ExtensionViewModel({
+                                extensionId: -1,
+                                extension: (parseInt(lastExtension) + 1).toString(),
+                                name: "Untitled",
+                                phoneNumber: lastPhoneNumber
+                            }, false, true));
+                        var extensions = this.extensions();
+                        $("#" + extensions[extensions.length - 1].domId()).collapse("show");
+                        $("[data-toggle='tooltip']").tooltip();
+                    }.bind(this);
+
+                    this.back = function() {
+                        window.history.back();
+                    }.bind(this);
+                }
+
+                var extensionsViewModel = new ExtensionsViewModel();
+                ko.applyBindings(extensionsViewModel, document.getElementById('extensions_div'));
+                extensionsViewModel.populateExtensions();
+            });

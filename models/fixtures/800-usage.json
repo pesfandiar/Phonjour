@@ -1,0 +1,53 @@
+[
+    {
+        "model": "Usage",
+        "data": {
+            "id": 1,
+            "from_number": "+17788857979",
+            "to_number": "+17788001381",
+            "duration": null,
+            "status": "in-progress",
+            "sid": "CA757f94db2fee9848cf0ba05164bdf1c2",
+            "dial_duration": 9,
+            "dial_status": "completed",
+            "dial_sid": "CA79d7baccd499560c0854394d305c2b1a",
+            "direction": "inbound",
+            "createdAt": "2015-09-03 19:21:38",
+            "PhoneNumber": 1
+         }
+    },
+    {
+        "model": "Usage",
+        "data": {
+            "id": 2,
+            "from_number": "+17788857979",
+            "to_number": "+17788001381",
+            "duration": 129,
+            "status": "completed",
+            "sid": "CA757f94db2fee9848cf0ba05164bdf1c2",
+            "dial_duration": null,
+            "dial_status": null,
+            "dial_sid": null,
+            "direction": "inbound",
+            "createdAt": "2015-09-03 19:21:39",
+            "PhoneNumber": 1
+         }
+    },
+    {
+        "model": "Usage",
+        "data": {
+            "id": 3,
+            "from_number": "+17788857979",
+            "to_number": "+17788001381",
+            "duration": 6,
+            "status": "completed",
+            "sid": "CA757f94db2fee9848cf0ba05164bdf1c3",
+            "dial_duration": null,
+            "dial_status": null,
+            "dial_sid": null,
+            "direction": "inbound",
+            "createdAt": "2015-09-03 19:21:40",
+            "PhoneNumber": 1
+         }
+    }
+]

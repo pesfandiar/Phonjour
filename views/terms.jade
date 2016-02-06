@@ -1,0 +1,61 @@
+extends layout
+
+block navbar
+    include navbar
+
+block content
+    #terms_div
+        .panel.panel-default
+            .panel-body
+                .row
+                    .col-xs-12.col-sm-12
+                        h3 Terms of The Service
+                .row.top15
+                    .col-xs-12.col-sm-12
+                        p Please read these Terms of Service ("Terms", "Terms of Service") carefully before using the Phonjour website (the "Service") operated by Phonjour ("us", "we", or "our").
+                        p Your access to and use of the Service is conditioned on your acceptance of and compliance with these Terms. These Terms apply to all visitors, users and others who access or use the Service.
+                        p By accessing or using the Service you agree to be bound by these Terms. If you disagree with any part of the terms then you may not access the Service.
+                        p Termination: We may terminate or suspend access to our Service immediately, without prior notice or liability, for any reason whatsoever, including without limitation if you breach the Terms. All provisions of the Terms which by their nature should survive termination shall survive termination, including, without limitation, ownership provisions, warranty disclaimers, indemnity and limitations of liability.
+                        p Links To Other Web Sites: Our Service may contain links to third­party web sites or services that are not owned or controlled by Phonjour. Phonjour has no control over, and assumes no responsibility for, the content, privacy policies, or practices of any third party web sites or services. You further acknowledge and agree that Phonjour shall not be responsible or liable, directly or indirectly, for any damage or loss caused or alleged to be caused by or in connection with use of or reliance on any such content, goods or services available on or through any such web sites or services. We strongly advise you to read the terms and conditions and privacy policies of any third­party web sites or services that you visit.
+                        p Phone Number Release: The phone number associated with your account belongs to Phonjour. Termination of the Service may cause your phone number to be released into the available phone numbers of Twilio.com. If you want to terminate your account and transfer the phone number to another provider, you will have to contact us before termination. This process may take some time, and some fee may be charged for the transfer.
+                        p Service Level: As much as we strive to keep a high standard for the Service, we do not provide any service level agreement. We use thirdparty services including but not limited to Stripe.com for payment processing, Twilio.com for handling phone numbers, and Amazon Web Services for our servers. Any interruption in those services will inevitably interrupt the Service too.
+                        p Usage Calculation: Usage minutes are calculated by Twilio, a thirdparty party service, to the seconds. We will calculate your usage according to those numbers with precision of a second and a cent. Any call forwarding, including incoming or outgoing calls, will have two legs; one from your Phonjour phone number, and one to your Phonjour phone number. The minutes used by each leg will be calculated separately, and will be added to your total usage.
+                        p Credit Card Charge: We charge your credit card according to your current plan. This can happen at most once in a calendar month, and it may include the plan cost of the future month-long period, and usage cost of the previous period.
+                        p Governing Law: These Terms shall be governed and construed in accordance with the laws of British Columbia and Canada, without regard to its conflict of law provisions. Our failure to enforce any right or provision of these Terms will not be considered a waiver of those rights. If any provision of these Terms is held to be invalid or unenforceable by a court, the remaining provisions of these Terms will remain in effect. These Terms constitute the entire agreement between us regarding our Service, and supersede and replace any prior agreements we might have between us regarding the Service.
+                        p Changes: We reserve the right, at our sole discretion, to modify or replace these Terms at any time. If a revision is material we will try to provide prior notice to any new terms taking effect. What constitutes a material change will be determined at our sole discretion. By continuing to access or use our Service after those revisions become effective, you agree to be bound by the revised terms. If you do not agree to the new terms, please stop using the Service.
+                        p Thirdparty Trademarks: Stripe, Twilio, Amazon, and Amazon Web Services are trademarks owned by their respective companies. We do not own any of those trademarks, and none of those companies own or endorse Phonjour.
+                        p Contact Us: If you have any questions about these Terms, please contact us.
+
+        .panel.panel-default
+            .panel-body
+                .row
+                    .col-xs-12.col-sm-12
+                        h3 Privacy Policy
+                .row.top15
+                    .col-xs-12.col-sm-12
+                        p Phonjour ("us", "we", or "our") operates the Phonjour website ("Site", "Service"). This page informs you of our policies regarding the collection, use and disclosure of Personal Information we receive from users of the Site.
+                        p We use your Personal Information only for providing and improving the Site. By using the Site, you agree to the collection and use of information in accordance with this policy.
+                        p Information Collection And Use: While using our Service, we may ask you to provide us with certain personally identifiable information that can be used to contact or identify you. Personally identifiable information may include, but is not limited to your name ("Personal Information").
+                        p Log Data: Like many site operators, we collect information that your browser sends whenever you visit our Site ("Log Data"). This Log Data may include information such as your computer's Internet Protocol ("IP") address, browser type, browser version, the pages of our Site that you visit, the time and date of your visit, the time spent on those pages and other statistics.
+                        p Cookies: Cookies are files with small amount of data, which may include an anonymous unique identifier. Cookies are sent to your browser from a web site and stored on your computer's hard drive. Like many sites, we use "cookies" to collect information. You can instruct your browser to refuse all cookies or to indicate when a cookie is being sent. However, if you do not accept cookies, you may not be able to use some portions of our Site.
+                        p Security: The security of your Personal Information is important to us, but remember that no method of transmission over the Internet, or method of electronic storage, is 100% secure. While we strive to use commercially acceptable means to protect your Personal Information, we cannot guarantee its absolute security.
+                        p Credit Card Information: We do not store any credit card information on our servers. We use the service of Stripe.com to store all credit card information. Please refer to their privacy policy and terms of service for more information.
+                        p Changes To This Privacy Policy: Phonjour may update this Privacy Policy from time to time. We will notify you of any changes by posting the new Privacy Policy on the Site. You are advised to review this Privacy Policy periodically for any changes.
+                        p Contact Us: If you have any questions about this Privacy Policy, please contact us.
+        .panel.panel-default.top15
+            .panel-body
+                .row
+                    .col-xs-12.col-sm-3.col-sm-offset-3
+                        button.btn.btn-default(type="button", data-bind="click: back") Back
+
+        script(type="text/javascript").
+            $(document).ready(function() {
+
+                function TermsModelView() {
+                    this.back = function() {
+                        window.history.back();
+                    };
+                };
+
+                ko.applyBindings(new TermsModelView(), document.getElementById('terms_div'));
+            });

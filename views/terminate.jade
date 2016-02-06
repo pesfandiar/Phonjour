@@ -1,0 +1,109 @@
+extends layout
+
+block navbar
+    include navbar
+
+block sidebar
+    include sidebar
+
+block content
+    #terminate_div
+        h3 Terminate Account
+        .panel.panel-default
+            .panel-body
+                .row
+                    .col-xs-12.col-sm-12
+                        h3 Terminate Account
+                .row.top15
+                    .col-xs-12.col-sm-12
+                        p Terminating an account will IMMEDIATELY result in:
+                        ul
+                            li the permanent loss of phone number and its functionality [1]
+                            li the account to be closed, and access to sign-in revoked
+                            li the usage of the current period to be calculated and the credit card on file to be charged soon
+                            li the remainder of plan and add-on fees for the current period to NOT be refunded
+                        p [1] If you would like to transfer the phone number to another carrier, please contact us before terminating your account. Depending on your target carrier, transferring away the phone number may not be possible, may take a while, and may incur charges.
+                .row.top30
+                    .col-xs-12.col-sm-6
+                        strong I understand the implications, and I have read the&nbsp;
+                            a(href="/terms", target="_blank") terms
+                            span :
+                    .col-xs-12.col-sm-3
+                        input.form-control(type="checkbox", data-bind= "checked: agreeToTerms")
+        .panel.panel-default.top15
+            .panel-body
+                .row
+                    .col-xs-12.col-sm-12
+                        p We are sad to see you go! Please share with us the reason why you would like to leave:
+                .row.top15
+                    .col-xs-12.col-sm-6
+                        textarea.form-control(rows="3", data-bind="value: reason")
+                .row.top15
+                    .col-xs-12.col-sm-3
+                        label(for="password_input") Password:
+                    .col-xs-12.col-sm-3
+                        input.form-control(type="password", data-bind="value: password, valueUpdate: 'afterkeydown'")#password_input
+                .row.top30
+                    .col-xs-12.col-sm-3.col-sm-offset-3
+                        button.btn.btn-danger(type="button", data-bind="click: terminate, enable: agreeToTerms() && password()") Terminate
+                        #terminate_spinner.spinner-hidden
+                .row.top30.error-message-row#terminate_error_row
+                    .col-xs-12.col-sm-3.col-sm-offset-3
+                        .alert.alert-danger
+                            span.glyphicon.glyphicon-exclamation-sign
+                            span.left5#terminate_error_message .
+                .row.top30
+                    .col-xs-12.col-sm-3.col-sm-offset-3
+                        button.btn.btn-default(type="button", data-bind="click: back") Back
+
+        script(type="text/javascript").
+            $(document).ready(function() {
+
+                function TerminateModelView() {
+                    this.agreeToTerms = ko.observable(false);
+                    this.reason = ko.observable("");
+                    this.password = ko.observable("");
+
+                    this.back = function() {
+                        window.history.back();
+                    };
+
+                    this.terminate = function() {
+                        var password = this.password();
+
+                        if (!password || password.length < 5) {
+                            $("#terminate_error_message").text("Please enter your password!");
+                            $("#terminate_error_row").show();
+                            return;
+                        }
+
+                        $("#terminate_spinner").removeClass("spinner-hidden");
+                        $("#terminate_spinner").addClass("spinner");
+                        $("#terminate_error_row").hide();
+                        var apiData = {
+                            reason: this.reason(),
+                            agreeToTerms: this.agreeToTerms(),
+                            password: password
+                        };
+                        Phonjour.api('user', 'terminate', apiData)
+                            .done(function(data) {
+                                    if (data && data.success) {
+                                        document.location.href = "/sign_out";
+                                    } else {
+                                        $("#terminate_error_message").text("Unable to terminate account. Please contact us!");
+                                        $("#terminate_error_row").show();
+                                    }
+                                })
+                            .fail(function(error) {
+                                    $("#terminate_error_message").text(error.responseText);
+                                    $("#terminate_error_row").show();
+                                })
+                            .always(function() {
+                                    $("#terminate_spinner").removeClass("spinner");
+                                    $("#terminate_spinner").addClass("spinner-hidden");
+                                });
+                    }.bind(this);
+                };
+
+                ko.applyBindings(new TerminateModelView(), document.getElementById('terminate_div'));
+            });

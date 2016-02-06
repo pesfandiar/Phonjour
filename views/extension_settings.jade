@@ -1,0 +1,383 @@
+extends layout
+
+block navbar
+    include navbar
+
+block sidebar
+    include sidebar
+
+block content
+    #extension_settings_div
+        h2 Greetings &amp; Hours
+        .panel.panel-default
+            .panel-body
+                .row
+                    .col-xs-12.col-sm-3
+                        h3 Settings for:
+                            span.glyphicon.glyphicon-question-sign.left10(data-toggle="tooltip", title="Select your main Phonjour number or any of the extensions to manage its greetings and available hours.")
+                    .col-xs-12.col-sm-6
+                        select.form-control.force-width.top15#extension_select(data-bind="options: extensions, optionsText: 'caption', optionsValue: 'extensionId', value: selectedExtension, event:{change: extensionChanged}")
+                        #extensions_spinner.spinner-hidden
+                .row.top15.error-message-row#extension_settings_error_row
+                    .col-xs-12.col-sm-6.col-sm-offset-3
+                        .alert.alert-danger
+                            span.glyphicon.glyphicon-exclamation-sign
+                            span.left5#extension_settings_error_message .
+                .row.15
+                    .col-xs-12.col-sm-3
+                        h3 Greetings:
+                        #extension_settings_spinner.spinner-hidden
+                .row.top30
+                    .col-xs-12.col-sm-3
+                        label(for="open_greeting_input", data-bind="text: 'Greeting when ' + (main() ? 'open' : 'available') + ':'")
+                        span.glyphicon.glyphicon-question-sign.left5(data-bind="visible: main()", data-toggle="tooltip", title="This is the message that will be read when someone calls your Phonjour number and your business is open. You may want to instruct the caller to enter the desired extension number and press the number sign.")
+                        span.glyphicon.glyphicon-question-sign.left5(data-bind="visible: !main()", data-toggle="tooltip", title="This is the message that will be read before someone is being connected to this extension. Leave empty for immediate connection.")
+                    .col-xs-12.col-sm-6
+                        textarea.form-control(rows="3", data-bind="value: openGreeting, valueUpdate: 'afterkeydown'")#open_greeting_input
+                .row.top15
+                    .col-xs-12.col-sm-3
+                        label(for="closed_greeting_input", data-bind="text: 'Greeting when ' + (main() ? 'closed' : 'NOT available') + ':'")
+                        span.glyphicon.glyphicon-question-sign.left5(data-bind="visible: main()", data-toggle="tooltip", title="This is the message that will be read when someone calls your Phonjour number and your business is closed. The call will end after the message.")
+                        span.glyphicon.glyphicon-question-sign.left5(data-bind="visible: !main()", data-toggle="tooltip", title="This is the message that will be read when someone tries to connect to this extension, but it is not available. The call will end after the message.")
+                    .col-xs-12.col-sm-6
+                        textarea.form-control(rows="3", data-bind="value: closedGreeting, valueUpdate: 'afterkeydown'")#closed_greeting_input
+                .row.top15(data-bind="visible: main()")
+                    .col-xs-12.col-sm-3
+                        label(for="voicemail_input") Voicemail Enabled?
+                        span.glyphicon.glyphicon-question-sign.left5(data-toggle="tooltip", title="During closed hours, it will record the caller's message and email you the audio file.")
+                    .col-xs-12.col-sm-6
+                        input.form-control#voicemail_input(type="checkbox", data-bind="checked: voicemail")
+                .row.top30
+                    .col-xs-12.col-sm-12
+                        h3 Schedule:
+                .row.top15(data-bind="visible: !main()")
+                    .col-xs-12.col-sm-3
+                        label(for="use_global_schedule_input") Use the business schedule:
+                        span.glyphicon.glyphicon-question-sign.left5(data-toggle="tooltip", title="When selected, this extension is available during the business hour. Please uncheck to pick different hours during the business hours. Please note that extensions cannot be reached when the business is closed.")
+                    .col-xs-12.col-sm-6
+                        input.form-control#use_global_schedule_input(type="checkbox", data-bind="checked: useGlobalSchedule")
+                .row.top30(data-bind="visible: !useGlobalSchedule()")
+                    .col-xs-12.col-sm-8.col-sm-offset-2
+                        .table-responsive
+                            table.table.table-striped
+                                thead
+                                    tr
+                                        td
+                                            strong Day
+                                        td
+                                            strong(data-bind="text: main() ? 'Open?' : 'Available?'")
+                                        td
+                                            strong From
+                                        td
+                                            strong To
+                                        td
+                                            strong Open for
+                                tbody(data-bind="foreach: schedules")
+                                    tr
+                                        td(data-bind="text: dayName")
+                                        td
+                                            input.form-control(type="checkbox", data-bind="checked: open")
+                                        td
+                                            select.form-control.force-width(data-bind="visible: open, options: timeOptions, optionsText: 'text', optionsValue: 'value', value: fromTime, event:{change: fromTimeChanged}")
+                                        td
+                                            select.form-control.force-width(data-bind="visible: open, options: timeOptions, optionsText: 'text', optionsValue: 'value', value: toTime, event:{change: toTimeChanged}")
+                                        td
+                                            span(data-bind="text: openFor")
+
+                .row.top30.error-message-row#extensions_save_error_row
+                    .col-xs-12.col-sm-6.col-sm-offset-3
+                        .alert.alert-danger
+                            span.glyphicon.glyphicon-exclamation-sign
+                            span.left5#extensions_save_error_message .
+                .row.top30
+                    .col-xs-12.col-sm-3.col-sm-offset-3
+                        button.btn.btn-primary(type="button", data-bind="click: save, enable: dirty") Save Settings
+                        #extensions_save_spinner.spinner-hidden
+                .row.top15
+                    .col-xs-12.col-sm-3.col-sm-offset-3
+                        button.btn.btn-default(type="button", data-bind="click: back") Back
+        script(type="text/javascript").
+            $(document).ready(function() {
+                var HOLIDAYS_ENABLED = false;
+                var DAY_COUNT = 7 + (HOLIDAYS_ENABLED ? 1 : 0);
+                var DAY_NAMES = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday", "Holiday"];
+                var TIME_OPTIONS = [];
+                for (var i = 0; i <= 132; i++) {
+                    TIME_OPTIONS[i] = {value: i};
+                    var hour = Math.floor((i % 48) / 4);
+                    TIME_OPTIONS[i].text = (hour > 9 ? hour : "0" + hour) + ":";
+                    var minute = (i % 4) * 15;
+                    TIME_OPTIONS[i].text += (minute > 9 ? minute : "0" + minute) + " ";
+                    TIME_OPTIONS[i].text += (i / 48) % 2 >= 1 ? "PM" : "AM";
+                    TIME_OPTIONS[i].text += (i >= 96 ? " (+1d)" : "");
+                }
+
+                function ExtensionSettingsViewModel() {
+                    var self = this;
+                    this.extensionId = ko.observable("");
+                    this.dirty = ko.observable(false);
+                    this.main = ko.observable("");
+                    this.useGlobalSchedule = ko.observable(true);
+                    this.voicemail = ko.observable(false);
+                    this.extension = ko.observable("");
+                    this.selectedExtension = ko.observable();
+                    this.extensions = ko.observableArray();
+                    this.name = ko.observable("");
+
+                    this.openGreeting = ko.observable("");
+                    this.closedGreeting = ko.observable("");
+
+                    this.schedules = ko.observableArray();
+
+                    this._populatingExtensions = false;
+                    this._populatingExtensionSettings = false;
+
+                    function makeDirty() {
+                        self.dirty(true);
+                    }
+                    this.openGreeting.subscribe(makeDirty);
+                    this.closedGreeting.subscribe(makeDirty);
+                    this.useGlobalSchedule.subscribe(makeDirty);
+                    this.voicemail.subscribe(makeDirty);
+
+                    var ScheduleViewModel = function (day, open, fromTime, toTime) {
+                        this.dayName = DAY_NAMES[day];
+                        this.open = ko.observable(!!open);
+                        this.fromTime = ko.observable(fromTime);
+                        this.toTime = ko.observable(toTime);
+
+                        this.timeOptions = TIME_OPTIONS;
+
+                        var fixTime = function (fromChanged) {
+                            var fromTime = this.fromTime();
+                            var toTime = this.toTime();
+
+                            if (fromTime > toTime) {
+                                if (fromChanged) {
+                                    this.toTime(fromTime);
+                                } else {
+                                    this.fromTime(toTime);
+                                }
+                            }
+                        }
+                        this.fromTimeChanged = fixTime.bind(this, true);
+                        this.toTimeChanged = fixTime.bind(this, false);
+
+                        this.openFor = ko.computed(function() {
+                            var fromTime = this.fromTime();
+                            var toTime = this.toTime();
+                            var open = this.open();
+                            if (!open ||
+                                    typeof fromTime === "undefined" ||
+                                    typeof toTime === "undefined" ||
+                                    fromTime === toTime) {
+                                return "--";
+                            }
+
+                            var diff = toTime - fromTime;
+                            var result = "";
+                            var hours = Math.floor(diff / 4);
+                            if (hours > 0) {
+                                result += hours + "h";
+                            }
+                            var minutes = (diff % 4) * 15;
+                            if (minutes > 0) {
+                                result += " " + minutes + "m";
+                            }
+
+                            return result;
+                        }.bind(this));
+
+                        this.open.subscribe(makeDirty);
+                        this.fromTime.subscribe(makeDirty);
+                        this.toTime.subscribe(makeDirty);
+                    }
+
+                    this._populateData = function (data) {
+                        this.extensionId(data.extension.extensionId);
+                        this.main(data.extension.main);
+                        this.useGlobalSchedule(!data.extension.main && data.extension.useGlobalSchedule);
+                        this.voicemail(data.extension.main && data.extension.voicemail);
+                        this.extension(data.extension.extension);
+                        this.name(data.extension.name);
+
+                        if (data.extension.main) {
+                            this.selectedExtension(null);
+                            window.location.hash = "";
+                        } else {
+                            this.selectedExtension(data.extension.extensionId);
+                            window.location.hash = "#" + data.extension.extensionId;
+                        }
+
+                        if (!$.isEmptyObject(data.extension.greetings)) {
+                            this.openGreeting(data.extension.greetings[true].text);
+                            this.closedGreeting(data.extension.greetings[false].text);
+                        } else {
+                            this.openGreeting("");
+                            this.closedGreeting("");
+                        }
+
+                        this.schedules.removeAll();
+                        for (var day = 0; day < DAY_COUNT; day++) {
+                            var schedule = data.extension.schedules[day];
+                            if (schedule) {
+                                this.schedules.push(new ScheduleViewModel(
+                                        day,
+                                        schedule.open,
+                                        schedule.fromTime,
+                                        schedule.toTime
+                                    ));
+                            } else {
+                                this.schedules.push(new ScheduleViewModel(
+                                        day,
+                                        false,
+                                        36,
+                                        68
+                                    ));
+                            }
+                        }
+
+                        this.dirty(false);
+                    }.bind(this);
+
+                    this.populateExtensionSettings = function() {
+                        if (self._populatingExtensions) {
+                            return;
+                        }
+
+                        $("#extension_settings_spinner").removeClass("spinner-hidden");
+                        $("#extension_settings_spinner").addClass("spinner");
+                        $("#extension_settings_error_row").hide();
+
+                        var bookmark = window.location.hash ? window.location.hash.split("#")[1] : null;
+                        self._populatingExtensionSettings = true;
+                        Phonjour.api('extensionSettings', 'get', {extensionId: bookmark})
+                            .done(function(data) {
+                                    if (data && data.extension) {
+                                        this._populateData(data);
+                                    } else {
+                                        $("#extension_settings_error_message").text("Was not able to retrieve extension settings!");
+                                        $("#extension_settings_error_row").show();
+                                    }
+                                }.bind(this))
+                            .fail(function(error) {
+                                    $("#extension_settings_error_message").text("Was not able to retrieve extension settings!");
+                                    $("#extension_settings_error_row").show();
+                                })
+                            .always(function() {
+                                    $("#extension_settings_spinner").removeClass("spinner");
+                                    $("#extension_settings_spinner").addClass("spinner-hidden");
+                                    self._populatingExtensionSettings = false;
+                                });
+                    }.bind(this);
+
+                    this.extensionChanged = function() {
+                        if (this._populatingExtensions || this._populatingExtensionSettings) {
+                            return;
+                        }
+
+                        var selectedExtension = this.selectedExtension();
+                        if (selectedExtension === null) {
+                            window.location.hash = "";
+                        } else if (typeof selectedExtension !== "undefined") {
+                            window.location.hash = "#" + selectedExtension;
+                        }
+                        this.populateExtensionSettings();
+                    }.bind(this);
+
+                    this.populateExtensions = function() {
+                        $("#extensions_spinner").removeClass("spinner-hidden");
+                        $("#extensions_spinner").addClass("spinner");
+                        $("#extension_settings_error_row").hide();
+                        self._populatingExtensions = true;
+                        Phonjour.api('extension', 'list')
+                            .done(function(data) {
+                                    if (data && data.extensions) {
+                                        self.extensions.removeAll();
+                                        self.extensions.push({
+                                            caption: "Main Phone Number",
+                                            extensionId: null
+                                        });
+                                        for (var i = 0; i < data.extensions.length; i++) {
+                                            $.extend(data.extensions[i], {
+                                                                            caption: data.extensions[i].extension + " - " + data.extensions[i].name + " (" + data.extensions[i].phoneNumber + ")"
+                                                                        });
+                                            self.extensions.push(data.extensions[i]);
+                                        }
+                                    } else {
+                                        $("#extension_settings_error_message").text("Was not able to retrieve extensions!");
+                                        $("#extension_settings_error_row").show();
+                                    }
+                                })
+                            .fail(function(error) {
+                                    $("#extension_settings_error_message").text("Was not able to retrieve extensions!");
+                                    $("#extension_settings_error_row").show();
+                                })
+                            .always(function() {
+                                    $("#extensions_spinner").removeClass("spinner");
+                                    $("#extensions_spinner").addClass("spinner-hidden");
+                                    self._populatingExtensions = false;
+                                    self.populateExtensionSettings();
+                                });
+                    }.bind(this);
+
+                    this.back = function() {
+                        window.history.back();
+                    };
+
+                    this.save = function() {
+                        $("#extensions_save_spinner").removeClass("spinner-hidden");
+                        $("#extensions_save_spinner").addClass("spinner");
+
+                        var apiData = {
+                            extensionId: this.extensionId(),
+                            greetings: {
+                                true: this.openGreeting(),
+                                false: this.closedGreeting()
+                            },
+                            schedules: [],
+                            useGlobalSchedule: this.useGlobalSchedule(),
+                            voicemail: this.voicemail()
+                        };
+
+                        var schedules = this.schedules();
+                        for (var day = 0; day < DAY_COUNT; day++) {
+                            apiData.schedules[day] = {
+                                fromTime: schedules[day].fromTime(),
+                                toTime: schedules[day].toTime(),
+                                open: schedules[day].open()
+                            }
+                        }
+
+                        Phonjour.api('extensionSettings', 'save', apiData)
+                            .done(function(data) {
+                                if (data && data.success) {
+                                    this.dirty(false);
+                                } else {
+                                    $("#extensions_save_error_message").text("Was not able to save the settings!");
+                                    $("#extensions_save_error_row").show();
+                                }
+                            }.bind(this))
+                            .fail(function(error) {
+                                    $("#extensions_save_error_message").text(error.responseText);
+                                    $("#extensions_save_error_row").show();
+                                })
+                            .always(function() {
+                                    $("#extensions_save_spinner").removeClass("spinner");
+                                    $("#extensions_save_spinner").addClass("spinner-hidden");
+                                });
+                    }.bind(this);
+
+                }
+
+                var extensionSettingsViewModel = new ExtensionSettingsViewModel();
+                ko.applyBindings(extensionSettingsViewModel, document.getElementById('extension_settings_div'));
+                extensionSettingsViewModel.populateExtensions();
+
+                if ("onhashchange" in window) {
+                    window.onhashchange = function() {
+                        extensionSettingsViewModel.populateExtensionSettings();
+                    }
+                }
+            });
+

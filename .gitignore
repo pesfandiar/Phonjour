@@ -1,0 +1,6 @@
+credentials.js
+builtAssets/
+*.log
+*.pem
+*.crt
+*.csr

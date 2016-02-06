@@ -1,0 +1,56 @@
+[
+    {
+        "model": "Account",
+            "data": {
+                "id": 1,
+                "name": "John Smith",
+                "phone": "778-000-0000",
+                "email": "smith@phonjour.com",
+                "company": "John and Bros Inc.",
+                "timezone": "America/Vancouver",
+                "password_hash": "$2a$08$SpvQ.cR4Hfd696kvVS078u1QVmox4Eg8jRhP7t14DxjlEASTXrvG.",
+                "uuid": "48c2cd45-d778-476f-87ed-0d01c9ba2521",
+                "status": "PURCHASED",
+                "note": "He's a respected customer."
+             }
+    },
+    {
+        "model": "Account",
+            "data": {
+                "id": 2,
+                "name": "John Doe",
+                "phone": "778-100-0000",
+                "email": "doe@phonjour.com",
+                "timezone": "America/Vancouver",
+                "password_hash": "$2a$08$SpvQ.cR4Hfd696kvVS078u1QVmox4Eg8jRhP7t14DxjlEASTXrvG.",
+                "uuid": "48c2cd45-d778-476f-87ed-0d01c9ba2522",
+                "status": "SIGNED_UP"
+             }
+    },
+    {
+        "model": "Account",
+            "data": {
+                "id": 3,
+                "name": "John Phone",
+                "phone": "778-200-0000",
+                "email": "phone@phonjour.com",
+                "timezone": "America/Vancouver",
+                "password_hash": "$2a$08$SpvQ.cR4Hfd696kvVS078u1QVmox4Eg8jRhP7t14DxjlEASTXrvG.",
+                "uuid": "48c2cd45-d778-476f-87ed-0d01c9ba2523",
+                "status": "PAYMENT_ON_FILE"
+             }
+    },
+    {
+        "model": "Account",
+            "data": {
+                "id": 4,
+                "name": "Phonejour In Chief",
+                "phone": "778-123-0000",
+                "email": "admin@phonjour.com",
+                "timezone": "America/Vancouver",
+                "password_hash": "$2a$08$SpvQ.cR4Hfd696kvVS078u1QVmox4Eg8jRhP7t14DxjlEASTXrvG.",
+                "uuid": "48c2cd45-d778-476f-87ed-0d01c9ba2524",
+                "status": "PURCHASED"
+             }
+    }
+]

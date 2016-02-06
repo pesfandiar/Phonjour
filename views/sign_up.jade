@@ -1,0 +1,213 @@
+extends layout
+
+block navbar
+    include navbar
+
+block content
+    #sign_up_div
+        h3 Sign Up for Your Phonjour Account
+        .panel.panel-default
+            .panel-body
+                .row
+                    .col-xs-12.col-sm-3
+                        label(for="name_input") Your Name<sup class="mandatory">*</sup>:
+                    .col-xs-12.col-sm-3
+                        input.form-control(type = "text", data-bind="value: name")#name_input
+                .row.top15
+                    .col-xs-12.col-sm-3
+                        label(for="email_input") Email<sup class="mandatory">*</sup>:
+                        span.glyphicon.glyphicon-question-sign.left5(data-toggle="tooltip", title="Please use your best email address.")
+                    .col-xs-12.col-sm-3
+                        input.form-control(type = "email", data-bind="value: email")#email_input
+                .row.top15
+                    .col-xs-12.col-sm-3
+                        label(for="phone_input") Phone Number:
+                        span.glyphicon.glyphicon-question-sign.left5(data-toggle="tooltip", title="Just your contact info. Your Phonjour number will be different.")
+                    .col-xs-12.col-sm-3
+                        input.form-control(type = "text", pattern="[0-9]{10}", data-bind="value: phone")#phone_input
+                .row.top15
+                    .col-xs-12.col-sm-3
+                        label(for="company_input") Company:
+                    .col-xs-12.col-sm-3
+                        input.form-control(type = "text", data-bind="value: company")#company_input
+                .row.top15
+                    .col-xs-12.col-sm-3
+                        label(for="timezone_input") Timezone:
+                        span.glyphicon.glyphicon-question-sign.left5(data-toggle="tooltip", title="Please pick a city that has the same timezone as yours.")
+                    .col-xs-12.col-sm-3
+                        select.form-control(data-bind="options: timezoneOptions, value: timezone")#timezone_input
+                .row.top15
+                    .col-xs-12.col-sm-3
+                        label(for="password_input") Password<sup class="mandatory">*</sup>:
+                        span.glyphicon.glyphicon-remove.form-invalid-icon(data-bind="visible: !passwordValid()")
+                        span.glyphicon.glyphicon-ok.form-valid-icon(data-bind="visible: passwordValid")
+                        span.glyphicon.glyphicon-question-sign.left5(data-toggle="tooltip", title="Please pick a unique password with at least 8 characters.")
+                    .col-xs-12.col-sm-3
+                        input.form-control(type = "password", data-bind="value: password, valueUpdate: 'afterkeydown'")#password_input
+                .row.top15
+                    .col-xs-12.col-sm-3
+                        label(for="password2_input") Confirm Password<sup class="mandatory">*</sup>:
+                        span.glyphicon.glyphicon-remove.form-invalid-icon(data-bind="visible: !passwordsMatch()")
+                        span.glyphicon.glyphicon-ok.form-valid-icon(data-bind="visible: passwordsMatch")
+                        span.glyphicon.glyphicon-question-sign.left5(data-toggle="tooltip", title="Please type in your password again.")
+                    .col-xs-12.col-sm-3
+                        input.form-control(type = "password", data-bind="value: password2, valueUpdate: 'afterkeydown'")#password2_input
+                .row.top30
+                    .col-xs-12.col-sm-3.col-sm-offset-3
+                        button.btn.btn-primary#sign_up_button(type="button", data-bind="click: signUp, enable: formValid") Get Started
+                        #sign_up_spinner.spinner-hidden
+                .row.top30.error-message-row#sign_up_error_row
+                    .col-xs-12.col-sm-3.col-sm-offset-3
+                        .alert.alert-danger
+                            span.glyphicon.glyphicon-exclamation-sign
+                            span.left5#sign_up_error_message .
+        script(type="text/javascript").
+            $(document).ready(function() {
+                var PASSWORD_MIN_LEN = 8;
+                function SignUpViewModel() {
+                    var self = this;
+                    this.name = ko.observable("");
+                    this.email = ko.observable("");
+                    this.phone = ko.observable("");
+                    this.company = ko.observable("");
+                    this.password = ko.observable("");
+                    this.password2 = ko.observable("");
+
+                    this.timezone = ko.observable("America/Los_Angeles");
+                    this.timezoneOptions = [
+                        // 3:30
+                        "America/St_Johns",
+                        // 4:00
+                        "America/Halifax",
+                        // 5:00
+                        "America/Toronto",
+                        "America/New_York",
+                        // 6:00
+                        "America/Winnipeg",
+                        "America/Chicago",
+                        // 6:00 irregular
+                        "America/Regina",
+                        // 7:00
+                        "America/Edmonton",
+                        "America/Denver",
+                        // 7:00 irregular
+                        "America/Phoenix",
+                        // 8:00
+                        "America/Vancouver",
+                        "America/Los_Angeles",
+                        // 9:00
+                        "America/Anchorage",
+                        // 10:00
+                        "Pacific/Honolulu"
+                    ];
+
+                    function isSameTimezone(clockDiffHours, uctDiffHours) {
+                        return Math.abs(clockDiffHours - uctDiffHours) < 0.01;
+                    }
+
+                    this.guessTimezone = function() {
+                        var now = new Date();
+                        var timezoneDiff = now.getTimezoneOffset() / 60.0;
+
+                        var jan = new Date(now.getFullYear(), 0, 1);
+                        var jul = new Date(now.getFullYear(), 6, 1);
+                        var isDst = Math.max(jan.getTimezoneOffset(), jul.getTimezoneOffset()) > now.getTimezoneOffset();
+                        timezoneDiff += isDst ? 1 : 0;
+
+                        if (isSameTimezone(timezoneDiff, 3.5)) {
+                            this.timezone("America/St_Johns");
+                        } else if (isSameTimezone(timezoneDiff, 4)) {
+                            this.timezone("America/Halifax");
+                        } else if (isSameTimezone(timezoneDiff, 5)) {
+                            this.timezone("America/New_York");
+                        } else if (isSameTimezone(timezoneDiff, 6)) {
+                            this.timezone("America/Chicago");
+                        } else if (isSameTimezone(timezoneDiff, 7)) {
+                            this.timezone("America/Denver");
+                        } else if (isSameTimezone(timezoneDiff, 8)) {
+                            this.timezone("America/Los_Angeles");
+                        } else if (isSameTimezone(timezoneDiff, 9)) {
+                            this.timezone("America/Anchorage");
+                        } else if (isSameTimezone(timezoneDiff, 10)) {
+                            this.timezone("Pacific/Honolulu");
+                        }
+                    }.bind(this);
+
+                    this.formValid = ko.computed(function() {
+                            var password = this.password();
+                            return this.name() &&
+                                    this.email() &&
+                                    password &&
+                                    password.length >= PASSWORD_MIN_LEN &&
+                                    password === this.password2();
+                        }.bind(this));
+
+                    this.passwordValid = ko.computed(function() {
+                            var password = this.password();
+                            return password && password.length >= PASSWORD_MIN_LEN;
+                        }.bind(this));
+
+                    this.passwordsMatch = ko.computed(function() {
+                            var password = this.password();
+                            var password2 = this.password2();
+                            return password &&
+                                    password2 &&
+                                    password2.length > PASSWORD_MIN_LEN &&
+                                    password === password;
+                        }.bind(this));
+
+                    this.signUp = (function() {
+                        var name = this.name();
+                        var email = this.email();
+                        var phone = this.phone();
+                        var company = this.company();
+                        var timezone = this.timezone();
+                        var password = this.password();
+                        var password2 = this.password2();
+
+                        if (!this.formValid()) {
+                            return;
+                        }
+
+                        $("#sign_up_spinner").removeClass("spinner-hidden");
+                        $("#sign_up_spinner").addClass("spinner");
+                        var apiData = {
+                            name: name,
+                            email: email,
+                            phone: phone,
+                            company: company,
+                            timezone: timezone,
+                            password: password
+                        };
+                        Phonjour.api('user', 'signUp', apiData)
+                            .done(function(data) {
+                                    if (data && data.user && data.user.id) {
+                                        document.location.href = "/payment_setup";
+                                    } else {
+                                        $("#sign_up_error_message").text("Was not able to log in!");
+                                        $("#sign_up_error_row").show();
+                                    }
+                                })
+                            .fail(function(error) {
+                                    $("#sign_up_error_message").text(error.responseText);
+                                    $("#sign_up_error_row").show();
+                                })
+                            .always(function() {
+                                    $("#sign_up_spinner").removeClass("spinner");
+                                    $("#sign_up_spinner").addClass("spinner-hidden");
+                                });
+                    }).bind(this);
+                }
+
+                var signUpViewModel = new SignUpViewModel();
+                ko.applyBindings(signUpViewModel, document.getElementById('sign_up_div'));
+
+                signUpViewModel.guessTimezone();
+
+                $("#sign_up_div").keyup(function(event){
+                    if(event.keyCode === 13){
+                        $("#sign_up_button").click();
+                    }
+                });
+
+            });
