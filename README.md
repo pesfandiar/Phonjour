@@ -1,7 +1,5 @@
 ![alt tag](https://github.com/pesfandiar/Phonjour/blob/master/public/images/logo-large.png)
 
-== Phonjour
-
 Phonjour is a web application with simple phone automation features. I'm open sourcing this side project (read [the blog post here](http://www.pesfandiar.com/blog/2016/02/06/open-sourcing-my-nodejs-app)). Please feel free to extend it, deploy it, or use it as a boilerplate for another web applications.
 
 In order to run:
